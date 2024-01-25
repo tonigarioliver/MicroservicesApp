@@ -8,6 +8,9 @@ services:
     ports:
       - "1883:1883" #default mqtt port
       - "9001:9001" #default mqtt port for websockets
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/mosquitto.conf
+
 
   postgres_db:
     image: postgres
@@ -51,3 +54,6 @@ services:
 volumes:
   local_pgdata:
   pgadmin-data:
+  config:
+  data:
+  log:
