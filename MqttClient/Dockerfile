@@ -1,4 +1,3 @@
-# Use Maven image as the builder stage
 FROM maven:3.8.2-openjdk-17-slim AS builder
 
 WORKDIR /app
@@ -19,8 +18,8 @@ COPY --from=builder /app/target/*.jar /app/
 # Define el perfil activo (cambia "prod" según tus necesidades)
 ENV SPRING_PROFILES_ACTIVE=prod
 
-# Define the command to run the application
-CMD ["java","-Dspring.profiles.active=${SPRING_PROFILES_ACTIVE}", "-jar", "/app/IotDeviceService-0.0.1-SNAPSHOT.jar"]
+# Define el comando para ejecutar la aplicación con el perfil activo
+CMD ["java", "-Dspring.profiles.active=${SPRING_PROFILES_ACTIVE}", "-jar", "/app/MqttClient-0.0.1-SNAPSHOT.jar"]
 
 # Add metadata to the image
-LABEL version="iot_device_service"
+LABEL version="mqtt_client_service"

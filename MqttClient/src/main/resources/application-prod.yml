@@ -1,0 +1,5 @@
+mqtt:
+  server:
+    ip:   tcp://mqtt5
+    port: 1883
+  qos: 1

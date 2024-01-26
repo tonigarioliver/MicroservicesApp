@@ -25,7 +25,6 @@ public class MqttClientService {
     private final MqttMessage message;
     private MqttClient mqttClient;
     private MqttConnectionOptions mqttConnectionOptions;
-
     @Autowired
     public MqttClientService(final MqttClientConfig mqttClientConfig) {
         this.mqttClientConfig = mqttClientConfig;
@@ -38,14 +37,7 @@ public class MqttClientService {
             mqttClient = mqttClientConfig.mqttClient();
             mqttConnectionOptions = mqttClientConfig.mqttConnectionOptions();
             CompletableFuture<Void> connectionFuture = mqttConnectAsync();
-
             connectionFuture.thenAccept(result -> {
-                addSubscription("pipo");
-                try {
-                    mqttClient.publish("pipo", message);
-                } catch (MqttException e) {
-                    throw new RuntimeException(e);
-                }
             }).exceptionally(exception -> {
                 log.error("Error en la conexión MQTT: " + exception.getMessage(), exception);
                 return null;
@@ -71,37 +63,33 @@ public class MqttClientService {
 
     private class MqttMessageHandler implements org.eclipse.paho.mqttv5.client.MqttCallback {
 
-
         @Override
         public void disconnected(MqttDisconnectResponse mqttDisconnectResponse) {
-
         }
-
         @Override
         public void mqttErrorOccurred(MqttException e) {
-
         }
-
         @Override
         public void messageArrived(String topic, MqttMessage message) throws Exception {
             String messagePayload = new String(message.getPayload(), StandardCharsets.UTF_8);
             log.info("Received message on topic '{}': {}", topic, messagePayload);
             mqttClient.publish("pipo", message);
         }
-
         @Override
         public void deliveryComplete(IMqttToken iMqttToken) {
 
         }
-
         @Override
         public void connectComplete(boolean b, String s) {
-
+            addSubscription("pipo");
+            try {
+                mqttClient.publish("pipo", message);
+            } catch (MqttException e) {
+                throw new RuntimeException(e);
+            }
         }
-
         @Override
         public void authPacketArrived(int i, MqttProperties mqttProperties) {
-
         }
 
     }

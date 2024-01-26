@@ -51,6 +51,10 @@ services:
     ports:
       - "8001:8001"
 
+  mqtt_client_service:
+    container_name: mqtt_client_service
+    build: ./MqttClient
+
 volumes:
   local_pgdata:
   pgadmin-data:

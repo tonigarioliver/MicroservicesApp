@@ -1,6 +1,6 @@
-mqtt:
-  server:
-    ip:   tcp://localhost
-    port: 1883
-  qos: 1
+spring:
+  profiles:
+    active: dev
+  main:
+    web-application-type: none
 
