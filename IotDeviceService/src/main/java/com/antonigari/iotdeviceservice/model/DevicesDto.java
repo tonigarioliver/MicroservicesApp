@@ -1,13 +1,14 @@
 package com.antonigari.iotdeviceservice.model;
 
-import java.util.List;
-import lombok.Builder;
-import lombok.Value;
-import lombok.extern.jackson.Jacksonized;
+import lombok.*;
+import lombok.extern.jackson.*;
+
+import java.util.*;
 
 @Value
 @Builder
 @Jacksonized
 public class DevicesDto {
+    @Singular
     List<DeviceDto> devices;
 }

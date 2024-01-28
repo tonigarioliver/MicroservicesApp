@@ -7,6 +7,8 @@ import lombok.extern.jackson.Jacksonized;
 @Value
 @Builder
 @Jacksonized
-public class DeviceDto {
-     String manufactureCode;
+public class EnableDeviceRequestDto {
+    String manufactureCode;
+    boolean enable;
+
 }

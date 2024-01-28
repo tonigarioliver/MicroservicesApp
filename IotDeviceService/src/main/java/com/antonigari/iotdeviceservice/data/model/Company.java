@@ -6,27 +6,24 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Device {
+public class Company {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long deviceId;
-
-    @ManyToOne
-    @JoinColumn(name = "deviceModelId", nullable = false)
-    private DeviceModel deviceModel;
-
-    private LocalDateTime manufactureDate;
-    private BigDecimal price;
+    private Long companyId;
 
     @Column(unique = true)
-    private String manufactureCode;
+    private String name;
 
+    private String address;
+    private String phoneNumber;
+
+    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DeviceModel> deviceModels;
 }

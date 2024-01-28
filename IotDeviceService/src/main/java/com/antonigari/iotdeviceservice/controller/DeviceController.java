@@ -2,9 +2,13 @@ package com.antonigari.iotdeviceservice.controller;
 
 import com.antonigari.iotdeviceservice.model.DeviceDto;
 import com.antonigari.iotdeviceservice.model.DevicesDto;
+import com.antonigari.iotdeviceservice.service.impl.DeviceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Device Controller", description = "Operations related to Devices")
 @AllArgsConstructor
 public class DeviceController {
+    private final DeviceService deviceService;
     @PostMapping
     @Operation(summary = "Create Device", description = "Create a new Device.")
     public ResponseEntity<DeviceDto> createDevice() {
@@ -20,8 +25,13 @@ public class DeviceController {
     }
     @GetMapping
     @Operation(summary = "Read Devices", description = "Read list of Devices.")
-    public ResponseEntity<DevicesDto> readDevices() {
-        throw notImplementedException();
+    public ResponseEntity<DevicesDto> getDevices() {
+        return new ResponseEntity<>(this.deviceService.getAllAsync().join(), HttpStatus.OK);
+    }
+    @GetMapping(value = "/{serialNumber}")
+    @Operation(summary = "Get Device", description = "Get device by Serial Number.")
+    public ResponseEntity<DeviceDto> getDeviceBySerilaNumber(@PathVariable final String serialNumber) {
+        return new ResponseEntity<>(this.deviceService.getAsyncBySerialNumber(serialNumber).join(), HttpStatus.OK);
     }
 
     @PutMapping

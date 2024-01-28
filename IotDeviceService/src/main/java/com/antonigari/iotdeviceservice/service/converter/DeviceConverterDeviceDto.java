@@ -8,10 +8,12 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
 @Component
-public class DeviceConverter implements Converter<Device, DeviceDto> {
+public class DeviceConverterDeviceDto implements Converter<Device, DeviceDto> {
     @Override
     @NonNull
-    public DeviceDto convert(Device source) {
-        return null;
+    public DeviceDto convert(Device device) {
+        return  DeviceDto.builder()
+                        .manufactureCode(device.getManufactureCode())
+                        .build();
     }
 }
