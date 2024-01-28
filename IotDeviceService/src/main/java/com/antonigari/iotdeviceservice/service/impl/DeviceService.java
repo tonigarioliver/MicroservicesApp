@@ -5,6 +5,7 @@ import com.antonigari.iotdeviceservice.data.repository.DeviceRepository;
 import com.antonigari.iotdeviceservice.model.DeviceDto;
 import com.antonigari.iotdeviceservice.model.DevicesDto;
 import com.antonigari.iotdeviceservice.model.NewDeviceRequestDto;
+import com.antonigari.iotdeviceservice.model.UpdateDeviceRequestDto;
 import com.antonigari.iotdeviceservice.service.IDeviceService;
 import com.antonigari.iotdeviceservice.service.exception.ServiceErrorCatalog;
 import lombok.AllArgsConstructor;
@@ -50,6 +51,19 @@ public class DeviceService implements IDeviceService {
         final Device newDevice=conversionService.convert(newDeviceRequestDto,Device.class);
         deviceRepository.save(newDevice);
         return conversionService.convert(newDevice,DeviceDto.class);
+    }
+
+    @Override
+    public DeviceDto update(Long id, UpdateDeviceRequestDto updateDeviceRequestDto) {
+        return null;
+    }
+
+    @Override
+    public void delete(Long id) {
+        Device deviceToDelete = deviceRepository.findById(id)
+                .orElseThrow(() -> ServiceErrorCatalog.NOT_FOUND.exception("Device with ID " + id + " not found"));
+
+        deviceRepository.delete(deviceToDelete);
     }
 
 }

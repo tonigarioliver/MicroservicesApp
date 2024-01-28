@@ -1,4 +1,4 @@
 package com.antonigari.iotdeviceservice.model;
 
-public class DeviceEnableRequestDto {
+public class UpdateDeviceRequestDto {
 }
