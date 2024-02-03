@@ -34,7 +34,7 @@ public class DeviceService implements IDeviceService {
     }
     @Async
     @Override
-    public CompletableFuture<DeviceDto> getAsyncBySerialNumber(String manufactureCode) {
+    public CompletableFuture<DeviceDto> getAsyncByManufactureCode(String manufactureCode) {
         return CompletableFuture.supplyAsync(() ->
                 deviceRepository.findByManufactureCode(manufactureCode)
                         .map(device -> conversionService.convert(device, DeviceDto.class))
@@ -55,7 +55,15 @@ public class DeviceService implements IDeviceService {
 
     @Override
     public DeviceDto update(Long id, UpdateDeviceRequestDto updateDeviceRequestDto) {
-        return null;
+        Device existingDevice = deviceRepository.findById(id)
+                .orElseThrow(() -> ServiceErrorCatalog.NOT_FOUND.exception("DeviceModel with ID " + id + " not found"));
+
+        // Update fields as needed
+        existingDevice.setPrice(updateDeviceRequestDto.getPrice());
+        existingDevice.setManufactureCode(updateDeviceRequestDto.getManufactureCode());
+        existingDevice.setManufactureDate(updateDeviceRequestDto.getManufactureDate());
+        deviceRepository.save(existingDevice);
+        return conversionService.convert(existingDevice, DeviceDto.class);
     }
 
     @Override

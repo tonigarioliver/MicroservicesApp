@@ -10,5 +10,5 @@ import java.util.concurrent.CompletableFuture;
 
 public interface IDeviceService extends ICrudService<DeviceDto,NewDeviceRequestDto, UpdateDeviceRequestDto,DevicesDto> {
     @Async
-    CompletableFuture<DeviceDto> getAsyncBySerialNumber(String manufactureCode);
+    CompletableFuture<DeviceDto> getAsyncByManufactureCode(String manufactureCode);
 }

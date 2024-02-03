@@ -25,7 +25,7 @@ public class PhysicalMeasurement {
     @JoinColumn(name = "measurementTypeId")
     private MeasurementType measurementType;
 
-    private String units;
+    private String unit;
 
     @OneToMany(mappedBy = "physicalMeasurement", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DeviceMeasurement> deviceMeasurements;
