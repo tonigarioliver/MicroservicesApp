@@ -6,6 +6,7 @@ import { DeviceModel } from 'src/app/core/models/device-model';
 import { DeviceModelApiService } from 'src/app/core/services/device-model-api.service';
 import { MatDialog } from '@angular/material/dialog';
 import { CreateDeviceModelComponent } from 'src/app/core/pages/maintenance/components/device-model/components/create-device-model/create-device-model.component';
+import { DeviceModelCreateRequest } from 'src/app/core/models/device-model-create-request';
 
 @Component({
   selector: 'app-device-model',
@@ -13,17 +14,26 @@ import { CreateDeviceModelComponent } from 'src/app/core/pages/maintenance/compo
   styleUrls: ['./device-model.component.css'],
 })
 export class DeviceModelComponent implements OnInit {
-  displayedColumns: string[] = ['name', 'code'];
+  displayedColumns: string[] = ['name', 'code','actions'];
   dataSource = new MatTableDataSource<DeviceModel>(/* tu array de datos aquí */);
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort; // Añade el signo de exclamación aquí
+
+  deviceModelCreateRequest:DeviceModelCreateRequest={
+    name:'',
+    serialNumber:''
+  };
 
   constructor(private deviceModelApiService: DeviceModelApiService,private createDeviceModelDialog:MatDialog) {}
 
   ngOnInit(): void {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
+    this.fetchDeviceModels();
+  }
+
+  fetchDeviceModels():void{
     this.deviceModelApiService.getDeviceModels().subscribe(
       (deviceModels: DeviceModel[]) => {
         this.dataSource.data = deviceModels;
@@ -32,20 +42,29 @@ export class DeviceModelComponent implements OnInit {
         console.error('Error fetching device models:', error);
       }
     );
-
-    // Llena this.dataSource.data con tus datos
   }
-
   addDeviceModelDialog(): void {
     const dialogRef = this.createDeviceModelDialog.open(CreateDeviceModelComponent, {
-      width: '400px',  // Configura el ancho del diálogo según tus necesidades
-      // Ottras opciones de configuración si es necesario
+      width: '400px',
+      data: this.deviceModelCreateRequest
     });
   
     dialogRef.afterClosed().subscribe(result => {
-      // Puedes realizar acciones después de que se cierra el diálogo si es necesario
-      console.log('Diálogo cerrado', result);
+      this.fetchDeviceModels();
     });
   }
-  
+  editDeviceModel(deviceModel:DeviceModel):void{
+    console.debug(deviceModel);
+  }
+  deleteDeviceModel(deviceModel: DeviceModel): void {
+    this.deviceModelApiService.deleteDeviceModel(deviceModel.deviceModelId)
+      .subscribe(
+        () => {
+          this.fetchDeviceModels(); 
+        },
+        (error) => {
+          console.error('Error deleting device model:', error);
+        }
+      );
+  }
 }

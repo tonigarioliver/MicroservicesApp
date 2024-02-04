@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http
 import { Observable, throwError } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { DeviceModel } from 'src/app/core/models/device-model';
+import { DeviceModelCreateRequest } from 'src/app/core/models/device-model-create-request';
 
 @Injectable({
   providedIn: 'root'
@@ -17,5 +18,15 @@ export class DeviceModelApiService {
       .pipe(map(response => response.deviceModels ))
   }
 
-  // Add more methods for other HTTP methods (PUT, DELETE, etc.) if needed
+  postCreateDeviceModelRequest(deviceModelCreateRequest: DeviceModelCreateRequest): Observable<DeviceModel> {
+    return this.http.post<{ deviceModel: DeviceModel }>(this.serviceUrl, deviceModelCreateRequest)
+      .pipe(
+        map(response => response.deviceModel),
+      )
+  }
+  deleteDeviceModel(deviceModelId: number): Observable<void> {
+    const url = `${this.serviceUrl}/${deviceModelId}`
+    return this.http.delete<void>(url)
+  }
+
 }

@@ -1,7 +1,15 @@
-<h2 mat-dialog-title>Delete all elements?</h2>
-<mat-dialog-content>This will delete all elements that are currently on this page and cannot be undone.</mat-dialog-content>
+<h2 mat-dialog-title>Crear Nuevo Modelo de Dispositivo</h2>
+<mat-dialog-content>
+  <form>
+    <mat-form-field>
+      <input matInput placeholder="Nombre" [(ngModel)]="createDeviceModelRequest.name" name="name" required>
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput placeholder="Número de Serie" [(ngModel)]="createDeviceModelRequest.serialNumber" name="serialNumber" required>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
 <mat-dialog-actions>
-  <button mat-button mat-dialog-close>Cancel</button>
-  <!-- The mat-dialog-close directive optionally accepts a value as a result for the dialog. -->
-  <button mat-button [mat-dialog-close]="true">Delete</button>
+  <button mat-button (click)="onNoClick()">Cancelar</button>
+  <button mat-button (click)="postCreateDeviceModelRequest()">Guardar</button>
 </mat-dialog-actions>
