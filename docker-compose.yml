@@ -50,6 +50,8 @@ services:
     build: ./IotDeviceService
     ports:
       - "8001:8001"
+    depends_on:
+      - postgres_db
 
   mqtt_client_service:
     container_name: mqtt_client_service

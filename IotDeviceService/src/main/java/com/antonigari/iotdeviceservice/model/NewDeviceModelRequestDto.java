@@ -12,5 +12,5 @@ public class NewDeviceModelRequestDto {
     @NotBlank
     String name;
     @NotBlank
-    String functionality;
+    String serialNumber;
 }

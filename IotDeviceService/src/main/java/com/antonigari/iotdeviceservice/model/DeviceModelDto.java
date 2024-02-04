@@ -9,6 +9,7 @@ import lombok.extern.jackson.Jacksonized;
 @Jacksonized
 @Builder
 public class DeviceModelDto {
+    Long deviceModelId;
     @NotBlank
     String name;
     @NotBlank

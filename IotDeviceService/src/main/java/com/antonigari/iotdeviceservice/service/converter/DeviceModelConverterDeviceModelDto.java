@@ -12,6 +12,7 @@ public class DeviceModelConverterDeviceModelDto implements Converter<DeviceModel
     @NonNull
     public DeviceModelDto convert(DeviceModel deviceModel) {
         return  DeviceModelDto.builder()
+                .deviceModelId(deviceModel.getDeviceModelId())
                 .name(deviceModel.getName())
                 .serialNumber(deviceModel.getSerialNumber())
                 .build();
