@@ -1,0 +1,20 @@
+<h2 mat-dialog-title *ngIf="isEditMode">Edit Physical Measurement</h2>
+<h2 mat-dialog-title *ngIf="!isEditMode">Create Physical Measurement</h2>
+<mat-dialog-content>
+  <form [formGroup]="physicalMeasurementForm">
+    <div class="is-flex is-flex-direction-column">
+      <mat-form-field>
+        <mat-label for="name">Physical Measurement Name:</mat-label>
+        <input matInput id="name" formControlName="name"/>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label for="unit">Physical Measurement unit:</mat-label>
+        <input matInput id="unit" formControlName="unit" />
+      </mat-form-field>
+    </div>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">Cancelar</button>
+  <button mat-button (click)="saveChangesDialog()">Guardar</button>
+</mat-dialog-actions>

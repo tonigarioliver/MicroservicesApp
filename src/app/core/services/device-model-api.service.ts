@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
+import { HttpClient,} from '@angular/common/http';
+import { Observable, } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { DeviceModel } from 'src/app/core/models/device-model';
-import { DeviceModelCreateRequest } from 'src/app/core/models/device-model-create-request';
+import { DeviceModelRequest } from 'src/app/core/models/device-model-request';
 
 @Injectable({
   providedIn: 'root'
@@ -18,8 +18,15 @@ export class DeviceModelApiService {
       .pipe(map(response => response.deviceModels ))
   }
 
-  postCreateDeviceModelRequest(deviceModelCreateRequest: DeviceModelCreateRequest): Observable<DeviceModel> {
-    return this.http.post<{ deviceModel: DeviceModel }>(this.serviceUrl, deviceModelCreateRequest)
+  createDeviceModelRequest(deviceModelRequest: DeviceModelRequest): Observable<DeviceModel> {
+    return this.http.post<{ deviceModel: DeviceModel }>(this.serviceUrl, deviceModelRequest)
+      .pipe(
+        map(response => response.deviceModel),
+      )
+  }
+  updateDeviceModelRequest(deviceModelRequest: DeviceModelRequest): Observable<DeviceModel> {
+    const url = `${this.serviceUrl}/${deviceModelRequest.deviceModelId}`
+    return this.http.put<{ deviceModel: DeviceModel }>(url, deviceModelRequest)
       .pipe(
         map(response => response.deviceModel),
       )
