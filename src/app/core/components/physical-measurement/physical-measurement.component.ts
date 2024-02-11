@@ -11,7 +11,7 @@ import { PhysicalMeasurementApiService } from 'src/app/core/services/physical-me
 @Component({
   selector: 'app-physical-measurement',
   templateUrl: './physical-measurement.component.html',
-  styleUrls: ['./physical-measurement.component.css']
+  styleUrls: ['./physical-measurement.component.scss']
 })
 export class PhysicalMeasurementComponent {
   displayedColumns: string[] = ['name', 'unit', 'actions'];

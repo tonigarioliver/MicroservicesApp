@@ -9,7 +9,7 @@ import { PhysicalMeasurementRequest } from 'src/app/core/models/physical-measure
 })
 export class PhysicalMeasurementApiService {
 
-  private serviceUrl = 'http://localhost:8001/api/v1/device-model'; // Replace with your API URL
+  private serviceUrl = 'http://localhost:8001/api/v1/physical-measurements'; // Replace with your API URL
 
   constructor(private http: HttpClient) {}
 
