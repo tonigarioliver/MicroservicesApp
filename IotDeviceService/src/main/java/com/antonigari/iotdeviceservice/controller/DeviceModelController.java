@@ -2,8 +2,7 @@ package com.antonigari.iotdeviceservice.controller;
 
 import com.antonigari.iotdeviceservice.model.DeviceModelDto;
 import com.antonigari.iotdeviceservice.model.DeviceModelsDto;
-import com.antonigari.iotdeviceservice.model.NewDeviceModelRequestDto;
-import com.antonigari.iotdeviceservice.model.UpdateDeviceModelRequestDto;
+import com.antonigari.iotdeviceservice.model.DeviceModelRequestDto;
 import com.antonigari.iotdeviceservice.service.impl.DeviceModelService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,8 +23,8 @@ public class DeviceModelController {
 
     @PostMapping
     @Operation(summary = "Create DeviceModel", description = "Create a new DeviceModel.")
-    public ResponseEntity<DeviceModelDto> createDeviceModel(@RequestBody @NotNull final NewDeviceModelRequestDto newDeviceModelRequestDto) {
-        return new ResponseEntity<>(this.deviceModelService.create(newDeviceModelRequestDto),
+    public ResponseEntity<DeviceModelDto> createDeviceModel(@RequestBody @NotNull final DeviceModelRequestDto deviceModelRequestDto) {
+        return new ResponseEntity<>(this.deviceModelService.create(deviceModelRequestDto),
                 HttpStatus.CREATED);
     }
 
@@ -45,8 +44,8 @@ public class DeviceModelController {
     @Operation(summary = "Update DeviceModel", description = "Update existing DeviceModel.")
     public ResponseEntity<DeviceModelDto> updateDeviceModel(
             @PathVariable @Positive final Long id,
-            @RequestBody @NotNull final UpdateDeviceModelRequestDto updateDeviceModelRequestDto) {
-        return new ResponseEntity<>(this.deviceModelService.update(id, updateDeviceModelRequestDto),
+            @RequestBody @NotNull final DeviceModelRequestDto deviceModelRequestDto) {
+        return new ResponseEntity<>(this.deviceModelService.update(id, deviceModelRequestDto),
                 HttpStatus.OK);
     }
 

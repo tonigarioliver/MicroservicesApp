@@ -4,7 +4,7 @@ import java.util.concurrent.CompletableFuture;
 
 public interface ICrudService<Dto, N,U,LDto> {
     CompletableFuture<LDto> getAllAsync();
-    Dto create(N Ndto);
-    Dto update(Long id, U Udto);
-    void delete(Long id);
+    Dto create(final N Ndto);
+    Dto update(final long id, final U Udto);
+    void delete(final long id);
 }

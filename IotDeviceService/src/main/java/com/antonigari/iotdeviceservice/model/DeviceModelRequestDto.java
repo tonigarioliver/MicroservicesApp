@@ -8,7 +8,7 @@ import lombok.extern.jackson.Jacksonized;
 @Value
 @Jacksonized
 @Builder
-public class NewDeviceModelRequestDto {
+public class DeviceModelRequestDto {
     @NotBlank
     String name;
     @NotBlank

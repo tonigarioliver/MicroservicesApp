@@ -7,7 +7,8 @@ import lombok.extern.jackson.Jacksonized;
 @Value
 @Builder
 @Jacksonized
-public class NewPhysicalMeasurementRequestDto {
+public class PhysicalMeasurementRequestDto {
+    Long physicalMeasurementId;
     @NotBlank
     String name;
     @NotBlank

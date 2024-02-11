@@ -41,7 +41,7 @@ public class CompanyService implements ICompanyService {
     }
 
     @Override
-    public CompanyDto update(Long id, UpdateCompanyRequestDto updateCompanyRequestDto) {
+    public CompanyDto update(long id, UpdateCompanyRequestDto updateCompanyRequestDto) {
         Company existingCompany = companyRepository.findByName(updateCompanyRequestDto.getName())
                 .orElseThrow(() -> ServiceErrorCatalog.NOT_FOUND.exception("Company with ID " + updateCompanyRequestDto.getName() +" not found"));
 
@@ -55,7 +55,7 @@ public class CompanyService implements ICompanyService {
     }
 
     @Override
-    public void delete(Long companyId) {
+    public void delete(long companyId) {
         Company companyToDelete = companyRepository.findById(companyId)
                 .orElseThrow(() -> ServiceErrorCatalog.NOT_FOUND.exception("Company with ID " + companyId + " not found"));
 

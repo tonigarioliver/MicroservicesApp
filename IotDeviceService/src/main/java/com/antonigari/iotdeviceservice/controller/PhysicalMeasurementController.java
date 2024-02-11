@@ -12,15 +12,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 @RestController
-@RequestMapping(path = "/api/v1/device")
+@RequestMapping(path = "/api/v1/physical-measurements")
 @Tag(name = "PhysicalMeasurement Controller", description = "Operations related to Devices")
 @AllArgsConstructor
 public class PhysicalMeasurementController {
     private final PhysicalMeasurementService physicalMeasurementService;
     @PostMapping
     @Operation(summary = "Create PhysicalMeasurement", description = "Create a new PhysicalMeasurement.")
-    public ResponseEntity<PhysicalMeasurementDto> createPhysicalMeasurement(@RequestBody @NotNull final NewPhysicalMeasurementRequestDto newPhysicalMeasurementRequestDto) {
-        return new ResponseEntity<>(this.physicalMeasurementService.create(newPhysicalMeasurementRequestDto),
+    public ResponseEntity<PhysicalMeasurementDto> createPhysicalMeasurement(@RequestBody @NotNull final PhysicalMeasurementRequestDto physicalMeasurementRequestDto) {
+        return new ResponseEntity<>(this.physicalMeasurementService.create(physicalMeasurementRequestDto),
                 HttpStatus.CREATED);
     }
     @GetMapping
@@ -36,14 +36,16 @@ public class PhysicalMeasurementController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Update PhysicalMeasurement", description = "Update existing PhysicalMeasurement.")
-    public ResponseEntity<PhysicalMeasurementDto> updatePhysicalMeasurement(@PathVariable @Positive final Long id,
-                                                               @RequestBody @NotNull UpdatePhysicalMeasurementRequestDto updatePhysicalMeasurementRequestDto) {
-        return new ResponseEntity<>(this.physicalMeasurementService.update(id,updatePhysicalMeasurementRequestDto),HttpStatus.OK);
+    public ResponseEntity<PhysicalMeasurementDto> updatePhysicalMeasurement(
+            @PathVariable @Positive final long id,
+            @RequestBody @NotNull final PhysicalMeasurementRequestDto physicalMeasurementRequestDto)
+    {
+        return new ResponseEntity<>(this.physicalMeasurementService.update(id,physicalMeasurementRequestDto),HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete PhysicalMeasurement", description = "Delete PhysicalMeasurement by id.")
-    public ResponseEntity<Void> deletePhysicalMeasurement(@PathVariable @Positive final Long id) {
+    public ResponseEntity<Void> deletePhysicalMeasurement(@PathVariable @Positive final long id) {
         this.physicalMeasurementService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

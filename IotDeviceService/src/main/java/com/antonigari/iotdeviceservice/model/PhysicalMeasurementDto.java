@@ -9,6 +9,7 @@ import lombok.extern.jackson.Jacksonized;
 @Builder
 @Jacksonized
 public class PhysicalMeasurementDto {
+    Long physicalMeasurementId;
     @NotBlank
     String name;
     @NotBlank

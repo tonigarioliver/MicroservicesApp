@@ -12,6 +12,7 @@ public class PhsyicalMeasurementConverterPhsyicalMeasurementDto implements Conve
     @NonNull
     public PhysicalMeasurementDto convert(PhysicalMeasurement physicalMeasurement) {
         return PhysicalMeasurementDto.builder()
+                .physicalMeasurementId(physicalMeasurement.getPhysicalMeasurementId())
                 .name(physicalMeasurement.getName())
                 .unit(physicalMeasurement.getUnit())
                 .build();

@@ -34,7 +34,7 @@ public class DeviceService implements IDeviceService {
     }
     @Async
     @Override
-    public CompletableFuture<DeviceDto> getAsyncByManufactureCode(String manufactureCode) {
+    public CompletableFuture<DeviceDto> getAsyncByManufactureCode(final String manufactureCode) {
         return CompletableFuture.supplyAsync(() ->
                 deviceRepository.findByManufactureCode(manufactureCode)
                         .map(device -> conversionService.convert(device, DeviceDto.class))
@@ -43,7 +43,7 @@ public class DeviceService implements IDeviceService {
     }
 
     @Override
-    public DeviceDto create(NewDeviceRequestDto newDeviceRequestDto) {
+    public DeviceDto create(final NewDeviceRequestDto newDeviceRequestDto) {
         deviceRepository.findByManufactureCode(newDeviceRequestDto.getManufactureCode())
                 .ifPresent(device -> {
                     throw ServiceErrorCatalog.CONFLICT.exception("Device with serialNumber: " + newDeviceRequestDto.getManufactureCode() + " already exists");
@@ -54,7 +54,7 @@ public class DeviceService implements IDeviceService {
     }
 
     @Override
-    public DeviceDto update(Long id, UpdateDeviceRequestDto updateDeviceRequestDto) {
+    public DeviceDto update(long id, final UpdateDeviceRequestDto updateDeviceRequestDto) {
         Device existingDevice = deviceRepository.findById(id)
                 .orElseThrow(() -> ServiceErrorCatalog.NOT_FOUND.exception("DeviceModel with ID " + id + " not found"));
 
@@ -67,7 +67,7 @@ public class DeviceService implements IDeviceService {
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(final long id) {
         Device deviceToDelete = deviceRepository.findById(id)
                 .orElseThrow(() -> ServiceErrorCatalog.NOT_FOUND.exception("Device with ID " + id + " not found"));
 
