@@ -18,7 +18,7 @@ export class DeviceModelComponent implements OnInit {
   tableData = new MatTableDataSource<DeviceModel>();
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort; 
+  @ViewChild(MatSort) sort!: MatSort;
 
   constructor(private deviceModelApiService: DeviceModelApiService, private deviceModelDialog: MatDialog) { }
 
@@ -54,9 +54,9 @@ export class DeviceModelComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       this.fetchDeviceModels();
     });
-}
+  }
 
-editDeviceModel(deviceModel: DeviceModel): void {
+  editDeviceModel(deviceModel: DeviceModel): void {
     const deviceModelRequest: DeviceModelRequest = {
       deviceModelId: deviceModel.deviceModelId,
       name: deviceModel.name,
@@ -71,17 +71,17 @@ editDeviceModel(deviceModel: DeviceModel): void {
     dialogRef.afterClosed().subscribe(result => {
       this.fetchDeviceModels();
     });
-}
+  }
 
-deleteDeviceModel(deviceModel: DeviceModel): void {
-  this.deviceModelApiService.deleteDeviceModel(deviceModel.deviceModelId)
-    .subscribe(
-      () => {
-        this.fetchDeviceModels();
-      },
-      (error) => {
-        console.error('Error deleting device model:', error);
-      }
-    );
+  deleteDeviceModel(deviceModel: DeviceModel): void {
+    this.deviceModelApiService.deleteDeviceModel(deviceModel.deviceModelId)
+      .subscribe(
+        () => {
+          this.fetchDeviceModels();
+        },
+        (error) => {
+          console.error('Error deleting device model:', error);
+        }
+      );
   }
 }

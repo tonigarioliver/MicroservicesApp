@@ -1,0 +1,32 @@
+<h2 mat-dialog-title *ngIf="isEditMode">Edit Device</h2>
+<h2 mat-dialog-title *ngIf="!isEditMode">Create Device</h2>
+<mat-dialog-content>
+  <form [formGroup]="deviceForm">
+    <div class="is-flex is-flex-direction-column">
+      <mat-form-field>
+        <mat-label for="deviceModel">Device Model:</mat-label>
+        <mat-select id="deviceModel" formControlName="deviceModel">
+          <mat-option *ngFor="let model of deviceModels" [value]="model.deviceModelId">
+            {{ model.name }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label for="manufactureDate">Manufacture Date:</mat-label>
+        <input matInput id="manufactureDate" formControlName="manufactureDate" />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label for="price">Price:</mat-label>
+        <input matInput id="price" formControlName="price" />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label for="manufactureCode">Manufacture Code:</mat-label>
+        <input matInput id="manufactureCode" formControlName="manufactureCode" />
+      </mat-form-field>
+    </div>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">Cancel</button>
+  <button mat-button (click)="saveChangesDialog()">Save</button>
+</mat-dialog-actions>

@@ -1,5 +1,5 @@
 export interface DeviceModel{
-    deviceModelId:number
+    deviceModelId:number 
     name:string,
     serialNumber:string,
 }
