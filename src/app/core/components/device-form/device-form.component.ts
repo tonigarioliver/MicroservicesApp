@@ -1,5 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { DeviceModel } from 'src/app/core/models/device-model';
 import { DeviceRequest } from 'src/app/core/models/device-request';
@@ -13,18 +14,19 @@ import { DeviceModelApiService } from 'src/app/core/services/device-model-api.se
 })
 export class DeviceFormComponent implements OnInit {
 
+
+  deviceForm: FormGroup
+
+  isEditMode: boolean
+
   deviceRequest: DeviceRequest = {
     deviceId: null,
     deviceModelId: 0,
     manufactureCode: '',
     price: null,
-    manufactureDate: ''
+    manufactureDate: new Date
   };
   deviceModels: DeviceModel[] = []
-
-  deviceForm: FormGroup
-
-  isEditMode: boolean
 
   constructor(
     private dialogRef: MatDialogRef<DeviceFormComponent>,
@@ -35,22 +37,24 @@ export class DeviceFormComponent implements OnInit {
   ) {
     this.deviceRequest = dialogData.deviceRequest;
     this.isEditMode = dialogData.isEditMode
-    this.fetchDeviceModels();
     this.deviceForm = this.formBuilder.group({
-      deviceModel: [this.getFirstMatchingDeviceModel(), [Validators.required]],
-      manufactureDate: [new Date(this.deviceRequest.manufactureDate), [Validators.required]],
-      price: [this.deviceRequest.price, [Validators.required]],
-      manufactureCode: [this.deviceRequest.manufactureCode, [Validators.required]],
+      deviceModel: ['', [Validators.required]],
+      manufactureDate: [null, [Validators.required]],
+      price: ['', [Validators.required]],
+      manufactureCode: ['', [Validators.required]],
     })
   }
   ngOnInit(): void {
     this.fetchDeviceModels();
     this.deviceForm = this.formBuilder.group({
       deviceModel: [this.getFirstMatchingDeviceModel(), [Validators.required]],
-      manufactureDate: [new Date(this.deviceRequest.manufactureDate), [Validators.required]],
+      manufactureDate: [null, [Validators.required]],
       price: [this.deviceRequest.price, [Validators.required]],
       manufactureCode: [this.deviceRequest.manufactureCode, [Validators.required]],
     })
+  }
+  addEvent(event: MatDatepickerInputEvent<Date>): void {
+    this.deviceForm.patchValue({ manufactureDate: event.value });
   }
   getFirstMatchingDeviceModel(): DeviceModel | null {
     const matchingModel = this.deviceModels.find(deviceModel => deviceModel.deviceModelId === this.deviceRequest.deviceModelId);
@@ -71,7 +75,7 @@ export class DeviceFormComponent implements OnInit {
   saveChangesDialog(): void {
     const request: DeviceRequest = {
       deviceId: this.deviceRequest.deviceId,
-      deviceModelId: this.deviceForm.value.deviceModel,
+      deviceModelId: this.deviceForm.value.deviceModel.deviceModelId,
       manufactureCode: this.deviceForm.value.manufactureCode,
       price: this.deviceForm.value.price,
       manufactureDate: this.deviceForm.value.manufactureDate.toISOString()

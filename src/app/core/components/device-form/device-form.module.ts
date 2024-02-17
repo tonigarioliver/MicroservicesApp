@@ -7,7 +7,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 import { DeviceFormComponent } from 'src/app/core/components/device-form/device-form.component';
+import { MatNativeDateModule } from '@angular/material/core';
 
 
 
@@ -22,6 +24,8 @@ import { DeviceFormComponent } from 'src/app/core/components/device-form/device-
     MatInputModule,
     MatIconModule,
     ReactiveFormsModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
   ],
   exports: [
     DeviceFormComponent

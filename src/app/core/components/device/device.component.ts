@@ -46,7 +46,7 @@ export class DeviceComponent implements OnInit {
       deviceModelId: 0,
       manufactureCode: '',
       price: null,
-      manufactureDate: (new Date()).toISOString()
+      manufactureDate: (new Date())
     };
     const isEditMode = false
     const dialogRef = this.deviceDialog.open(DeviceFormComponent, {
@@ -65,7 +65,7 @@ export class DeviceComponent implements OnInit {
       deviceModelId: device.deviceModel.deviceModelId,
       manufactureCode: device.manufactureCode,
       price: device.price,
-      manufactureDate: device.manufactureDate.toISOString()
+      manufactureDate: device.manufactureDate
     };
     const isEditMode = true
     const dialogRef = this.deviceDialog.open(DeviceFormComponent, {
