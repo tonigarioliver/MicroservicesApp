@@ -23,9 +23,10 @@ public class DeviceModelController {
 
     @PostMapping
     @Operation(summary = "Create DeviceModel", description = "Create a new DeviceModel.")
-    public ResponseEntity<DeviceModelDto> createDeviceModel(@RequestBody @NotNull final DeviceModelRequestDto deviceModelRequestDto) {
-        return new ResponseEntity<>(this.deviceModelService.create(deviceModelRequestDto),
-                HttpStatus.CREATED);
+    public ResponseEntity<DeviceModelDto> createDeviceModel(
+            @RequestBody @NotNull final DeviceModelRequestDto deviceModelRequestDto
+    ) {
+        return new ResponseEntity<>(this.deviceModelService.create(deviceModelRequestDto), HttpStatus.CREATED);
     }
 
     @GetMapping
@@ -43,15 +44,14 @@ public class DeviceModelController {
     @PutMapping("/{id}")
     @Operation(summary = "Update DeviceModel", description = "Update existing DeviceModel.")
     public ResponseEntity<DeviceModelDto> updateDeviceModel(
-            @PathVariable @Positive final Long id,
+            @PathVariable @Positive final long id,
             @RequestBody @NotNull final DeviceModelRequestDto deviceModelRequestDto) {
-        return new ResponseEntity<>(this.deviceModelService.update(id, deviceModelRequestDto),
-                HttpStatus.OK);
+        return new ResponseEntity<>(this.deviceModelService.update(id, deviceModelRequestDto), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete DeviceModel", description = "Delete DeviceModel by id.")
-    public ResponseEntity<Void> deleteDeviceModel(@PathVariable @Positive final Long id) {
+    public ResponseEntity<Void> deleteDeviceModel(@PathVariable @Positive final long id) {
         this.deviceModelService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

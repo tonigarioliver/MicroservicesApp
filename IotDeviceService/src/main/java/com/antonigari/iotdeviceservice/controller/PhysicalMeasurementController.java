@@ -19,7 +19,9 @@ public class PhysicalMeasurementController {
     private final PhysicalMeasurementService physicalMeasurementService;
     @PostMapping
     @Operation(summary = "Create PhysicalMeasurement", description = "Create a new PhysicalMeasurement.")
-    public ResponseEntity<PhysicalMeasurementDto> createPhysicalMeasurement(@RequestBody @NotNull final PhysicalMeasurementRequestDto physicalMeasurementRequestDto) {
+    public ResponseEntity<PhysicalMeasurementDto> createPhysicalMeasurement
+            (@RequestBody @NotNull final PhysicalMeasurementRequestDto physicalMeasurementRequestDto
+            ) {
         return new ResponseEntity<>(this.physicalMeasurementService.create(physicalMeasurementRequestDto),
                 HttpStatus.CREATED);
     }

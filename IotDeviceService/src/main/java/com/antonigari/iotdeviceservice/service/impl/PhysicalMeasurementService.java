@@ -26,8 +26,9 @@ public class PhysicalMeasurementService implements IPhysicalMeasurementService {
     @Override
     public CompletableFuture<PhysicalMeasurementsDto> getAllAsync() {
         return CompletableFuture.completedFuture(PhysicalMeasurementsDto.builder()
-                .physicalMeasurements(physicalMeasurementRepository.findAll().stream()
-                        .map(physicalMeasurement -> conversionService.convert(physicalMeasurement, PhysicalMeasurementDto.class))
+                .physicalMeasurements(this.physicalMeasurementRepository.findAll().stream()
+                        .map(physicalMeasurement -> this.conversionService
+                                .convert(physicalMeasurement, PhysicalMeasurementDto.class))
                         .toList())
                 .build());
     }
@@ -36,40 +37,46 @@ public class PhysicalMeasurementService implements IPhysicalMeasurementService {
     @Override
     public CompletableFuture<PhysicalMeasurementDto> findByName(final String name) {
         return CompletableFuture.supplyAsync(() ->
-                physicalMeasurementRepository.findByName(name)
-                        .map(physicalMeasurement -> conversionService.convert(physicalMeasurement, PhysicalMeasurementDto.class))
-                        .orElseThrow(() -> ServiceErrorCatalog.NOT_FOUND.exception("PhysicalMeasurement with ID " + name + " not found"))
+                this.physicalMeasurementRepository.findByName(name)
+                        .map(physicalMeasurement ->
+                                this.conversionService
+                                        .convert(physicalMeasurement, PhysicalMeasurementDto.class))
+                        .orElseThrow(() -> ServiceErrorCatalog
+                                .NOT_FOUND.exception("PhysicalMeasurement with ID " + name + " not found"))
         );
     }
 
     @Override
     public PhysicalMeasurementDto create(final PhysicalMeasurementRequestDto physicalMeasurementRequestDto) {
-        physicalMeasurementRepository.findByName(physicalMeasurementRequestDto.getName())
+        this.physicalMeasurementRepository.findByName(physicalMeasurementRequestDto.getName())
                 .ifPresent(physicalMeasurement -> {
-                    throw ServiceErrorCatalog.CONFLICT.exception("PhysicalMeasurement with NAME: " + physicalMeasurement.getName() + " already exists");
+                    throw ServiceErrorCatalog
+                            .CONFLICT.exception("PhysicalMeasurement with NAME: " + physicalMeasurement.getName() + " already exists");
                 });
-        PhysicalMeasurement newPhysicalMeasurement = conversionService.convert(physicalMeasurementRequestDto, PhysicalMeasurement.class);
-        physicalMeasurementRepository.save(newPhysicalMeasurement);
-        return conversionService.convert(newPhysicalMeasurement, PhysicalMeasurementDto.class);
+        PhysicalMeasurement newPhysicalMeasurement = this.conversionService
+                .convert(physicalMeasurementRequestDto, PhysicalMeasurement.class);
+        return this.conversionService
+                .convert(this.physicalMeasurementRepository.save(newPhysicalMeasurement), PhysicalMeasurementDto.class);
     }
 
     @Override
     public PhysicalMeasurementDto update(final long physicalMeasurementId, final PhysicalMeasurementRequestDto physicalMeasurementRequestDto) {
-        PhysicalMeasurement existingPhysicalMeasurement = physicalMeasurementRepository.findById(physicalMeasurementId)
-                .orElseThrow(() -> ServiceErrorCatalog.NOT_FOUND.exception("PhysicalMeasurement with ID " + physicalMeasurementId + " not found"));
+        PhysicalMeasurement existingPhysicalMeasurement = this.physicalMeasurementRepository.findById(physicalMeasurementId)
+                .orElseThrow(() -> ServiceErrorCatalog
+                        .NOT_FOUND.exception("PhysicalMeasurement with ID " + physicalMeasurementId + " not found"));
 
         existingPhysicalMeasurement.setName(physicalMeasurementRequestDto.getName());
         existingPhysicalMeasurement.setUnit(physicalMeasurementRequestDto.getUnit());
-
-        physicalMeasurementRepository.save(existingPhysicalMeasurement);
-        return conversionService.convert(existingPhysicalMeasurement, PhysicalMeasurementDto.class);
+        return this.conversionService
+                .convert(this.physicalMeasurementRepository.save(existingPhysicalMeasurement), PhysicalMeasurementDto.class);
     }
 
     @Override
     public void delete(final long physicalMeasurementId) {
-        PhysicalMeasurement physicalMeasurementToDelete = physicalMeasurementRepository.findById(physicalMeasurementId)
-                .orElseThrow(() -> ServiceErrorCatalog.NOT_FOUND.exception("PhysicalMeasurement with ID " + physicalMeasurementId + " not found"));
+        PhysicalMeasurement physicalMeasurementToDelete = this.physicalMeasurementRepository.findById(physicalMeasurementId)
+                .orElseThrow(() -> ServiceErrorCatalog
+                        .NOT_FOUND.exception("PhysicalMeasurement with ID " + physicalMeasurementId + " not found"));
 
-        physicalMeasurementRepository.delete(physicalMeasurementToDelete);
+        this.physicalMeasurementRepository.delete(physicalMeasurementToDelete);
     }
 }

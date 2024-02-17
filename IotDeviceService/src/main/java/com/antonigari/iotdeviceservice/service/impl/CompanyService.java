@@ -27,47 +27,45 @@ public class CompanyService implements ICompanyService {
     @Override
     public CompletableFuture<CompaniesDto> getAllAsync() {
         return CompletableFuture.completedFuture(CompaniesDto.builder()
-                .companies(companyRepository.findAll().stream()
-                        .map(company -> conversionService.convert(company, CompanyDto.class))
+                .companies(this.companyRepository.findAll().stream()
+                        .map(company -> this.conversionService.convert(company, CompanyDto.class))
                         .toList())
                 .build());
     }
 
     @Override
-    public CompanyDto create(NewCompanyRequestDto newCompanyRequestDto) {
-        Company newCompany = conversionService.convert(newCompanyRequestDto, Company.class);
-        companyRepository.save(newCompany);
-        return conversionService.convert(newCompany, CompanyDto.class);
+    public CompanyDto create(final NewCompanyRequestDto newCompanyRequestDto) {
+        final Company newCompany = this.conversionService.convert(newCompanyRequestDto, Company.class);
+        return this.conversionService.convert(this.companyRepository.save(newCompany), CompanyDto.class);
     }
 
     @Override
-    public CompanyDto update(long id, UpdateCompanyRequestDto updateCompanyRequestDto) {
-        Company existingCompany = companyRepository.findByName(updateCompanyRequestDto.getName())
-                .orElseThrow(() -> ServiceErrorCatalog.NOT_FOUND.exception("Company with ID " + updateCompanyRequestDto.getName() +" not found"));
-
-        // Update fields as needed
+    public CompanyDto update(long id, final UpdateCompanyRequestDto updateCompanyRequestDto) {
+        final Company existingCompany = this.companyRepository.findByName(updateCompanyRequestDto.getName())
+                    .orElseThrow(() -> ServiceErrorCatalog
+                        .NOT_FOUND.exception("Company with ID " + updateCompanyRequestDto.getName() +" not found"));
         existingCompany.setName(updateCompanyRequestDto.getName());
         existingCompany.setAddress(updateCompanyRequestDto.getAddress());
         existingCompany.setPhoneNumber(updateCompanyRequestDto.getPhoneNumber());
-
-        companyRepository.save(existingCompany);
-        return conversionService.convert(existingCompany, CompanyDto.class);
+        return conversionService.convert(this.companyRepository.save(existingCompany), CompanyDto.class);
     }
 
     @Override
-    public void delete(long companyId) {
-        Company companyToDelete = companyRepository.findById(companyId)
-                .orElseThrow(() -> ServiceErrorCatalog.NOT_FOUND.exception("Company with ID " + companyId + " not found"));
+    public void delete(final long companyId) {
+        Company companyToDelete = this.companyRepository.findById(companyId)
+                .orElseThrow(() -> ServiceErrorCatalog
+                        .NOT_FOUND.exception("Company with ID " + companyId + " not found"));
 
-        companyRepository.delete(companyToDelete);
+        this.companyRepository.delete(companyToDelete);
     }
 
     @Override
     public CompletableFuture<CompanyDto> findByName(String name) {
         return CompletableFuture.supplyAsync(() ->
-                companyRepository.findByName(name)
-                        .map(company -> conversionService.convert(company, CompanyDto.class))
-                        .orElseThrow(() -> ServiceErrorCatalog.NOT_FOUND.exception("Company with name " + name + " not found"))
+                this.companyRepository.findByName(name)
+                        .map(company -> this.conversionService.convert(company, CompanyDto.class))
+                        .orElseThrow(() -> ServiceErrorCatalog
+                                .NOT_FOUND.exception("Company with name " + name + " not found"))
         );
     }
 }
