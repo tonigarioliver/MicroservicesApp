@@ -11,11 +11,11 @@ import java.time.LocalDateTime;
 @Builder
 @Jacksonized
 public class DeviceDto {
-     Long deviceId;
-     String manufactureCode;
+    Long deviceId;
+    String manufactureCode;
 
-     DeviceModelDto deviceModel;
+    DeviceModelDto deviceModel;
 
-     LocalDateTime manufactureDate;
-     BigDecimal price;
+    LocalDateTime manufactureDate;
+    BigDecimal price;
 }
