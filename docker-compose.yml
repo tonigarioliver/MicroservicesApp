@@ -6,11 +6,12 @@ services:
     image: eclipse-mosquitto
     container_name: mqtt5
     ports:
-      - "1883:1883" #default mqtt port
-      - "9001:9001" #default mqtt port for websockets
+      - "1883:1883" # default MQTT port
+      - "9001:9001" # default MQTT port for websockets
     volumes:
-      - ./mosquitto/mosquitto.conf:/mosquitto/mosquitto.conf
-      -
+      - ./mosquitto/config:/mosquitto/config
+    command: [ "sh", "-c", "cp /mosquitto/config/mosquitto_custom.conf /mosquitto/config/mosquitto.conf && exec mosquitto -c /mosquitto/config/mosquitto.conf" ]
+
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     environment:
