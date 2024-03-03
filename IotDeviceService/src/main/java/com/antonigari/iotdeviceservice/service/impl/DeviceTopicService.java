@@ -41,7 +41,11 @@ public class DeviceTopicService implements IDeviceTopicService {
         final Device existingDevice = this.deviceRepository.findByManufactureCode(Ndto.getManufactureCode())
                 .orElseThrow(() -> ServiceErrorCatalog
                         .NOT_FOUND.exception("Device with manufacutreCode" + Ndto.getManufactureCode() + " not found"));
-        final DeviceTopic newDeviceTopic = DeviceTopic.builder().device(existingDevice).topic(DeviceTopic.getTopic(existingDevice)).build();
+        final DeviceTopic newDeviceTopic = DeviceTopic.builder()
+                .deviceManufactureCode(existingDevice.getManufactureCode())
+                .device(existingDevice)
+                .topic(DeviceTopic.getTopic(existingDevice))
+                .build();
         return this.conversionService.convert(this.deviceTopicRepository.save(newDeviceTopic), DeviceTopicDto.class);
     }
 

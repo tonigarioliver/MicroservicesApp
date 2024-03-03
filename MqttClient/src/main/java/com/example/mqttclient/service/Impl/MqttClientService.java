@@ -2,7 +2,10 @@ package com.example.mqttclient.service.Impl;
 
 import com.example.mqttclient.config.mqtt.MqttClientConfig;
 import com.example.mqttclient.data.model.MqttTopic;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.mqttv5.client.IMqttToken;
 import org.eclipse.paho.mqttv5.client.MqttClient;
@@ -11,7 +14,6 @@ import org.eclipse.paho.mqttv5.client.MqttDisconnectResponse;
 import org.eclipse.paho.mqttv5.common.MqttException;
 import org.eclipse.paho.mqttv5.common.MqttMessage;
 import org.eclipse.paho.mqttv5.common.packet.MqttProperties;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
@@ -21,19 +23,17 @@ import java.util.concurrent.CompletableFuture;
 
 @Service
 @Slf4j
+@AllArgsConstructor
 public class MqttClientService {
 
     private final MqttClientConfig mqttClientConfig;
-    private final MqttMessage message;
+    private final MqttMessage message = new MqttMessage("helloworld".getBytes(StandardCharsets.UTF_8));
+    ;
     private MqttClient mqttClient;
     private MqttConnectionOptions mqttConnectionOptions;
     private final Set<MqttTopic> mqttTopics = new HashSet<>();
+    private final ObjectMapper objectMapper;
 
-    @Autowired
-    public MqttClientService(final MqttClientConfig mqttClientConfig) {
-        this.mqttClientConfig = mqttClientConfig;
-        this.message = new MqttMessage("helloworld".getBytes(StandardCharsets.UTF_8));
-    }
 
     @PostConstruct
     public void initialize() {
@@ -123,7 +123,7 @@ public class MqttClientService {
         }
         log.info("New topic added: " + topic);
         this.mqttTopics.add(topic);
-        this.subscribeTopics();
+        this.subscribeTopic(topic);
     }
 
     public synchronized void removeSubscription(final MqttTopic topic) {
@@ -133,7 +133,7 @@ public class MqttClientService {
         }
         log.info("Topic to remove: " + topic);
         this.mqttTopics.remove(topic);
-        this.subscribeTopics();
+        this.unsubscribeTopic(topic);
     }
 
     public synchronized void updateSubscription(final MqttTopic updatedTopic) {
@@ -147,12 +147,32 @@ public class MqttClientService {
             log.info("Topic not found for update: " + updatedTopic);
             return;
         }
-
         // Remove existing topic and add the updated one
         this.mqttTopics.remove(existingTopic);
         this.mqttTopics.add(updatedTopic);
 
         log.info("Topic updated: " + updatedTopic);
-        this.subscribeTopics();
+        this.unsubscribeTopic(existingTopic);
+        this.addSubscription(updatedTopic);
+    }
+
+    private void unsubscribeTopic(final MqttTopic topic) {
+        try {
+            this.mqttClient.unsubscribe(this.objectMapper.writeValueAsString(topic));
+        } catch (final MqttException e) {
+            log.error(e.getMessage());
+        } catch (final JsonProcessingException e) {
+            log.error(e.getMessage());
+        }
+    }
+
+    private void subscribeTopic(final MqttTopic topic) {
+        try {
+            this.mqttClient.subscribe(this.objectMapper.writeValueAsString(topic), 1);
+        } catch (final MqttException e) {
+            log.error(e.getMessage());
+        } catch (final JsonProcessingException e) {
+            log.error(e.getMessage());
+        }
     }
 }
