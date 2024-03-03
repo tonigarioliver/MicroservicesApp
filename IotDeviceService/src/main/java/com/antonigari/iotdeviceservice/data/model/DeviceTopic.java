@@ -23,8 +23,7 @@ public class DeviceTopic {
 
     static public String getTopic(final Device deviceSource) {
         return deviceSource.getManufactureCode() + "-" +
-                deviceSource.getDeviceModel().getSerialNumber() + "-" +
-                deviceSource.getDeviceModel().getName() + "-" +
-                deviceSource.getDeviceModel().getDeviceFunctionality().getName();
+                deviceSource.getDeviceModel().getSerialNumber() + "-";
+
     }
 }

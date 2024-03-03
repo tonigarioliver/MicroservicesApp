@@ -2,18 +2,13 @@ package com.antonigari.iotdeviceservice.service.impl;
 
 import com.antonigari.iotdeviceservice.data.model.Device;
 import com.antonigari.iotdeviceservice.data.model.DeviceModel;
-import com.antonigari.iotdeviceservice.data.model.KafkaMessage;
 import com.antonigari.iotdeviceservice.data.repository.DeviceModelRepository;
 import com.antonigari.iotdeviceservice.data.repository.DeviceRepository;
 import com.antonigari.iotdeviceservice.model.DeviceDto;
 import com.antonigari.iotdeviceservice.model.DeviceRequestDto;
-import com.antonigari.iotdeviceservice.model.DeviceTopicDto;
 import com.antonigari.iotdeviceservice.model.DevicesDto;
 import com.antonigari.iotdeviceservice.service.IDeviceService;
-import com.antonigari.iotdeviceservice.service.IDeviceTopicService;
 import com.antonigari.iotdeviceservice.service.exception.ServiceErrorCatalog;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
@@ -31,9 +26,6 @@ public class DeviceService implements IDeviceService {
     private final DeviceRepository deviceRepository;
     private final DeviceModelRepository deviceModelRepository;
     private final ConversionService conversionService;
-    private final KafkaProducerService kafkaProducerService;
-    private final ObjectMapper objectMapper;
-    private final IDeviceTopicService deviceTopicService;
 
     @Async
     @Override
@@ -52,7 +44,17 @@ public class DeviceService implements IDeviceService {
                 this.deviceRepository.findByManufactureCode(manufactureCode)
                         .map(device -> this.conversionService.convert(device, DeviceDto.class))
                         .orElseThrow(() -> ServiceErrorCatalog
-                                .NOT_FOUND.exception("Device with serialNumber " + manufactureCode + " not found"))
+                                .NOT_FOUND.exception("Device with manufactureCode " + manufactureCode + " not found"))
+        );
+    }
+
+    @Override
+    public CompletableFuture<DeviceDto> getAsyncById(final long id) {
+        return CompletableFuture.supplyAsync(() ->
+                this.deviceRepository.findById(id)
+                        .map(device -> this.conversionService.convert(device, DeviceDto.class))
+                        .orElseThrow(() -> ServiceErrorCatalog
+                                .NOT_FOUND.exception("Device with ID " + id + " not found"))
         );
     }
 
@@ -68,9 +70,7 @@ public class DeviceService implements IDeviceService {
                         .NOT_FOUND.exception("DeviceModel with ID " + deviceRequestDto.getDeviceModelId() + " not found"));
         final Device newDevice = this.conversionService.convert(deviceRequestDto, Device.class);
         newDevice.setDeviceModel(deviceModel);
-        final DeviceDto savedDevice = this.conversionService.convert(this.deviceRepository.save(newDevice), DeviceDto.class);
-        this.sendMessageToKafka("new-device", this.deviceTopicService.create(savedDevice));
-        return savedDevice;
+        return this.conversionService.convert(this.deviceRepository.save(newDevice), DeviceDto.class);
     }
 
     @Override
@@ -81,10 +81,7 @@ public class DeviceService implements IDeviceService {
         existingDevice.setPrice(deviceRequestDto.getPrice());
         existingDevice.setManufactureCode(deviceRequestDto.getManufactureCode());
         existingDevice.setManufactureDate(deviceRequestDto.getManufactureDate());
-        final DeviceDto updatedDevice = this.conversionService.convert(this.deviceRepository.save(existingDevice), DeviceDto.class);
-        final DeviceTopicDto existingDeviceTopic = this.deviceTopicService.getAsyncByManufactureCode(updatedDevice.getManufactureCode()).join();
-        this.sendMessageToKafka("updated-device", this.deviceTopicService.update(existingDeviceTopic.getId(), updatedDevice));
-        return updatedDevice;
+        return this.conversionService.convert(this.deviceRepository.save(existingDevice), DeviceDto.class);
     }
 
 
@@ -94,20 +91,5 @@ public class DeviceService implements IDeviceService {
                 .orElseThrow(() -> ServiceErrorCatalog
                         .NOT_FOUND.exception("Device with ID " + id + " not found"));
         this.deviceRepository.delete(deviceToDelete);
-        final DeviceTopicDto deviceTopic = this.deviceTopicService.getAsyncByManufactureCode(deviceToDelete.getManufactureCode()).join();
-        this.sendMessageToKafka("delete-device", deviceTopic);
-    }
-
-    private boolean sendMessageToKafka(final String topic, final DeviceTopicDto deviceTopic) {
-        try {
-            final String payload = this.objectMapper.writeValueAsString(deviceTopic);
-            return this.kafkaProducerService.sendMessage(KafkaMessage.builder()
-                    .topic(topic)
-                    .message(payload)
-                    .build());
-        } catch (final JsonProcessingException e) {
-            log.error(e.getMessage());
-            return false;
-        }
     }
 }

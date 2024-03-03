@@ -7,7 +7,10 @@ import org.springframework.scheduling.annotation.Async;
 
 import java.util.concurrent.CompletableFuture;
 
-public interface IDeviceService extends ICrudService<DeviceDto, DeviceRequestDto, DeviceRequestDto,DevicesDto> {
+public interface IDeviceService extends ICrudService<DeviceDto, DeviceRequestDto, DeviceRequestDto, DevicesDto> {
     @Async
     CompletableFuture<DeviceDto> getAsyncByManufactureCode(String manufactureCode);
+
+    @Async
+    CompletableFuture<DeviceDto> getAsyncById(long id);
 }
