@@ -7,8 +7,10 @@ import com.antonigari.iotdeviceservice.data.repository.DeviceModelRepository;
 import com.antonigari.iotdeviceservice.data.repository.DeviceRepository;
 import com.antonigari.iotdeviceservice.model.DeviceDto;
 import com.antonigari.iotdeviceservice.model.DeviceRequestDto;
+import com.antonigari.iotdeviceservice.model.DeviceTopicDto;
 import com.antonigari.iotdeviceservice.model.DevicesDto;
 import com.antonigari.iotdeviceservice.service.IDeviceService;
+import com.antonigari.iotdeviceservice.service.IDeviceTopicService;
 import com.antonigari.iotdeviceservice.service.exception.ServiceErrorCatalog;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,6 +33,7 @@ public class DeviceService implements IDeviceService {
     private final ConversionService conversionService;
     private final KafkaProducerService kafkaProducerService;
     private final ObjectMapper objectMapper;
+    private final IDeviceTopicService deviceTopicService;
 
     @Async
     @Override
@@ -65,23 +68,25 @@ public class DeviceService implements IDeviceService {
                         .NOT_FOUND.exception("DeviceModel with ID " + deviceRequestDto.getDeviceModelId() + " not found"));
         final Device newDevice = this.conversionService.convert(deviceRequestDto, Device.class);
         newDevice.setDeviceModel(deviceModel);
-        final DeviceDto devicedSaved = this.conversionService.convert(this.deviceRepository.save(newDevice), DeviceDto.class);
-        this.sendMessageToKafka("new-device", devicedSaved);
-        return devicedSaved;
+        final DeviceDto savedDevice = this.conversionService.convert(this.deviceRepository.save(newDevice), DeviceDto.class);
+        this.sendMessageToKafka("new-device", this.deviceTopicService.create(savedDevice));
+        return savedDevice;
     }
 
     @Override
     public DeviceDto update(final long id, final DeviceRequestDto deviceRequestDto) {
         final Device existingDevice = this.deviceRepository.findById(id)
                 .orElseThrow(() -> ServiceErrorCatalog
-                        .NOT_FOUND.exception("DeviceModel with ID " + id + " not found"));
+                        .NOT_FOUND.exception("Device with ID " + id + " not found"));
         existingDevice.setPrice(deviceRequestDto.getPrice());
         existingDevice.setManufactureCode(deviceRequestDto.getManufactureCode());
         existingDevice.setManufactureDate(deviceRequestDto.getManufactureDate());
         final DeviceDto updatedDevice = this.conversionService.convert(this.deviceRepository.save(existingDevice), DeviceDto.class);
-        this.sendMessageToKafka("updated-device", updatedDevice);
+        final DeviceTopicDto existingDeviceTopic = this.deviceTopicService.getAsyncByManufactureCode(updatedDevice.getManufactureCode()).join();
+        this.sendMessageToKafka("updated-device", this.deviceTopicService.update(existingDeviceTopic.getId(), updatedDevice));
         return updatedDevice;
     }
+
 
     @Override
     public void delete(final long id) {
@@ -89,15 +94,16 @@ public class DeviceService implements IDeviceService {
                 .orElseThrow(() -> ServiceErrorCatalog
                         .NOT_FOUND.exception("Device with ID " + id + " not found"));
         this.deviceRepository.delete(deviceToDelete);
-        this.sendMessageToKafka("delete-device", this.conversionService.convert(deviceToDelete, DeviceDto.class));
+        final DeviceTopicDto deviceTopic = this.deviceTopicService.getAsyncByManufactureCode(deviceToDelete.getManufactureCode()).join();
+        this.sendMessageToKafka("delete-device", deviceTopic);
     }
 
-    private boolean sendMessageToKafka(final String topic, final DeviceDto device) {
+    private boolean sendMessageToKafka(final String topic, final DeviceTopicDto deviceTopic) {
         try {
-            final String payload = this.objectMapper.writeValueAsString(device);
+            final String payload = this.objectMapper.writeValueAsString(deviceTopic);
             return this.kafkaProducerService.sendMessage(KafkaMessage.builder()
                     .topic(topic)
-                    .message("pipo")
+                    .message(payload)
                     .build());
         } catch (final JsonProcessingException e) {
             log.error(e.getMessage());

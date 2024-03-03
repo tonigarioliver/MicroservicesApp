@@ -3,3 +3,9 @@ mqtt:
     ip: tcp://localhost
     port: 1883
   qos: 1
+spring:
+  kafka:
+    bootstrap-servers: localhost:29092
+    consumer:
+      group-id: iot-info-service
+      topics: "new-device,delete-device,update-device"

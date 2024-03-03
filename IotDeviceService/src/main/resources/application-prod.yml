@@ -13,4 +13,4 @@ spring:
   kafka:
     bootstrap-servers: kafka:9092
     consumer:
-      group-id: my-group-id
+      group-id: iot-info-service

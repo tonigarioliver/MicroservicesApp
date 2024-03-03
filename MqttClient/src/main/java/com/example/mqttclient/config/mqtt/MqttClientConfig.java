@@ -1,4 +1,4 @@
-package com.example.mqttclient.config;
+package com.example.mqttclient.config.mqtt;
 
 import lombok.Data;
 import org.eclipse.paho.mqttv5.client.MqttClient;
@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.UUID;
+
 @Configuration
 @Data
 public class MqttClientConfig {
@@ -19,14 +20,14 @@ public class MqttClientConfig {
     private String qos;
 
     public MqttClient mqttClient() throws Exception {
-        String clientId = UUID.randomUUID().toString();
-        String serverUrl = serverIp + ":" + serverPort;
-        MqttClient mqttClient = new MqttClient(serverUrl, clientId, new MemoryPersistence());
+        final String clientId = UUID.randomUUID().toString();
+        final String serverUrl = this.serverIp + ":" + this.serverPort;
+        final MqttClient mqttClient = new MqttClient(serverUrl, clientId, new MemoryPersistence());
         return mqttClient;
     }
 
     public MqttConnectionOptions mqttConnectionOptions() throws Exception {
-        MqttConnectionOptions options = new MqttConnectionOptions();
+        final MqttConnectionOptions options = new MqttConnectionOptions();
         options.setAutomaticReconnect(true);
         options.setCleanStart(true);
         options.setConnectionTimeout(10);

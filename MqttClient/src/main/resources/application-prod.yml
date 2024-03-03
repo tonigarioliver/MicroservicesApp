@@ -1,5 +1,11 @@
 mqtt:
   server:
-    ip:   tcp://mqtt5
+    ip: tcp://mqtt5
     port: 1883
   qos: 1
+spring:
+  kafka:
+    bootstrap-servers: kafka:9092
+    consumer:
+      group-id: iot-info-service
+      topics: "new-device,delete-device,update-device"
