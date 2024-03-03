@@ -29,4 +29,7 @@ public class Device {
     @Column(unique = true)
     private String manufactureCode;
 
+    @OneToOne(mappedBy = "device", cascade = CascadeType.ALL, orphanRemoval = true)
+    private DeviceTopic deviceTopic;
+
 }

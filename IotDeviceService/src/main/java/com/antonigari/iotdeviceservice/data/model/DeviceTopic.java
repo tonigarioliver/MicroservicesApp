@@ -17,6 +17,7 @@ public class DeviceTopic {
     private long id;
     private String topic;
     private String deviceManufactureCode;
+    
     @OneToOne
     @JoinColumn(name = "deviceId", nullable = false)
     private Device device;
