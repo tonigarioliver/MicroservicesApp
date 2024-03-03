@@ -1,8 +1,6 @@
 package com.antonigari.iotdeviceservice.service.impl;
 
 import com.antonigari.iotdeviceservice.data.model.KafkaMessage;
-import com.antonigari.iotdeviceservice.data.repository.DeviceModelRepository;
-import com.antonigari.iotdeviceservice.data.repository.DeviceRepository;
 import com.antonigari.iotdeviceservice.model.DeviceDto;
 import com.antonigari.iotdeviceservice.model.DeviceRequestDto;
 import com.antonigari.iotdeviceservice.model.DeviceTopicDto;
@@ -11,7 +9,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.convert.ConversionService;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -21,9 +18,6 @@ import java.util.concurrent.CompletableFuture;
 @Service
 @Slf4j
 public class DeviceManagerService {
-    private final DeviceRepository deviceRepository;
-    private final DeviceModelRepository deviceModelRepository;
-    private final ConversionService conversionService;
     private final KafkaProducerService kafkaProducerService;
     private final ObjectMapper objectMapper;
     private final DeviceTopicService deviceTopicService;

@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @AllArgsConstructor
 public class KafkaConsumerService implements IKafkaConsumerService {
-    private final ObjectMapper objectMapper;
     private final MqttClientService mqttClientService;
 
     @Override
@@ -23,7 +22,8 @@ public class KafkaConsumerService implements IKafkaConsumerService {
         log.info(payload);
         final MqttTopic mqttTopic;
         try {
-            mqttTopic = this.objectMapper.readValue(payload, MqttTopic.class);
+            final ObjectMapper objectMapper = new ObjectMapper();
+            mqttTopic = objectMapper.readValue(payload, MqttTopic.class);
             this.processMessage(topic, mqttTopic);
 
         } catch (final JsonProcessingException e) {
@@ -33,7 +33,7 @@ public class KafkaConsumerService implements IKafkaConsumerService {
 
     private void processMessage(final String topic, final MqttTopic mqttTopic) {
         switch (topic) {
-            case "new-devie":
+            case "new-device":
                 this.mqttClientService.addSubscription(mqttTopic);
                 break;
             case "update-device":

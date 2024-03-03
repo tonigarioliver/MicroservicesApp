@@ -1,22 +1,20 @@
 package com.example.mqttclient.service.Impl;
 
 import com.example.mqttclient.config.mqtt.MqttClientConfig;
+import com.example.mqttclient.config.mqtt.MqttCustomClient;
 import com.example.mqttclient.data.model.MqttTopic;
+import com.example.mqttclient.service.utilities.MqttMessageHandler;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.paho.mqttv5.client.IMqttToken;
-import org.eclipse.paho.mqttv5.client.MqttClient;
-import org.eclipse.paho.mqttv5.client.MqttConnectionOptions;
-import org.eclipse.paho.mqttv5.client.MqttDisconnectResponse;
 import org.eclipse.paho.mqttv5.common.MqttException;
 import org.eclipse.paho.mqttv5.common.MqttMessage;
-import org.eclipse.paho.mqttv5.common.packet.MqttProperties;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalTime;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -27,19 +25,12 @@ import java.util.concurrent.CompletableFuture;
 public class MqttClientService {
 
     private final MqttClientConfig mqttClientConfig;
-    private final MqttMessage message = new MqttMessage("helloworld".getBytes(StandardCharsets.UTF_8));
-    ;
-    private MqttClient mqttClient;
-    private MqttConnectionOptions mqttConnectionOptions;
+    private final MqttCustomClient mqttCustomClient;
     private final Set<MqttTopic> mqttTopics = new HashSet<>();
-    private final ObjectMapper objectMapper;
-
 
     @PostConstruct
     public void initialize() {
         try {
-            this.mqttClient = this.mqttClientConfig.mqttClient();
-            this.mqttConnectionOptions = this.mqttClientConfig.mqttConnectionOptions();
             final CompletableFuture<Void> connectionFuture = this.mqttConnectAsync();
             connectionFuture.thenAccept(result -> {
             }).exceptionally(exception -> {
@@ -54,67 +45,16 @@ public class MqttClientService {
     public CompletableFuture<Void> mqttConnectAsync() {
         final CompletableFuture<Void> future = new CompletableFuture<>();
         try {
-            final MqttMessageHandler listener = new MqttMessageHandler();
-            this.mqttClient.setCallback(listener);
-            this.mqttClient.connect(this.mqttConnectionOptions);
+            this.mqttCustomClient.getMqttClient().connect(this.mqttClientConfig.mqttConnectionOptions());
             future.complete(null);
+            final MqttMessageHandler listener = new MqttMessageHandler(this.mqttCustomClient);
+            this.mqttCustomClient.getMqttClient().setCallback(listener);
         } catch (final MqttException e) {
             log.error("Error en la conexión MQTT: " + e.getMessage(), e);
             future.completeExceptionally(e);
         }
         return future;
     }
-
-    private class MqttMessageHandler implements org.eclipse.paho.mqttv5.client.MqttCallback {
-
-        @Override
-        public void disconnected(final MqttDisconnectResponse mqttDisconnectResponse) {
-        }
-
-        @Override
-        public void mqttErrorOccurred(final MqttException e) {
-        }
-
-        @Override
-        public void messageArrived(final String topic, final MqttMessage message) throws Exception {
-            final String messagePayload = new String(message.getPayload(), StandardCharsets.UTF_8);
-            //log.info("Received message on topic '{}': {}", topic, messagePayload);
-            MqttClientService.this.mqttClient.publish("pipo", message);
-        }
-
-        @Override
-        public void deliveryComplete(final IMqttToken iMqttToken) {
-
-        }
-
-        @Override
-        public void connectComplete(final boolean b, final String s) {
-        }
-
-        @Override
-        public void authPacketArrived(final int i, final MqttProperties mqttProperties) {
-        }
-
-    }
-
-    private synchronized void subscribeTopics() {
-        try {
-            final String[] topicsArray = this.mqttTopics.stream().map(MqttTopic::getTopic).toArray(String[]::new);
-            final int[] qos = new int[topicsArray.length];
-            this.mqttClient.unsubscribe(topicsArray);
-            this.mqttClient.subscribe(topicsArray, qos);
-            for (final String mqttTopic : topicsArray) {
-                try {
-                    this.mqttClient.publish(mqttTopic, this.message);
-                } catch (final MqttException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        } catch (final MqttException e) {
-            log.error("Error while updating subscription: " + e.getMessage(), e);
-        }
-    }
-
 
     public synchronized void addSubscription(final MqttTopic topic) {
         if (this.mqttTopics.contains(topic)) {
@@ -158,7 +98,8 @@ public class MqttClientService {
 
     private void unsubscribeTopic(final MqttTopic topic) {
         try {
-            this.mqttClient.unsubscribe(this.objectMapper.writeValueAsString(topic));
+            final ObjectMapper objectMapper = new ObjectMapper();
+            this.mqttCustomClient.getMqttClient().unsubscribe(objectMapper.writeValueAsString(topic));
         } catch (final MqttException e) {
             log.error(e.getMessage());
         } catch (final JsonProcessingException e) {
@@ -168,7 +109,10 @@ public class MqttClientService {
 
     private void subscribeTopic(final MqttTopic topic) {
         try {
-            this.mqttClient.subscribe(this.objectMapper.writeValueAsString(topic), 1);
+            final ObjectMapper objectMapper = new ObjectMapper();
+            this.mqttCustomClient.getMqttClient().subscribe(objectMapper.writeValueAsString(topic), 1);
+            final MqttMessage message = new MqttMessage(LocalTime.now().toString().getBytes(StandardCharsets.UTF_8));
+            this.mqttCustomClient.getMqttClient().publish(objectMapper.writeValueAsString(topic), message);
         } catch (final MqttException e) {
             log.error(e.getMessage());
         } catch (final JsonProcessingException e) {
