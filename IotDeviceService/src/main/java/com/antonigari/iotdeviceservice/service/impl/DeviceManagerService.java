@@ -44,7 +44,7 @@ public class DeviceManagerService {
         final DeviceDto deviceUpdated = this.deviceService.update(id, deviceRequestDto);
         final DeviceTopicDto existingDeviceTopic = this.deviceTopicService.getAsyncByManufactureCode(deviceUpdated.getManufactureCode()).join();
         final DeviceTopicDto deviceTopicUpdated = this.deviceTopicService.update(existingDeviceTopic.getId(), deviceUpdated);
-        this.sendMessageToKafka("updated-device", deviceTopicUpdated);
+        this.sendMessageToKafka("update-device", deviceTopicUpdated);
         return deviceUpdated;
     }
 

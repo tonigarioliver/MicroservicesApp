@@ -87,10 +87,6 @@ public class MqttClientService {
             log.info("Topic not found for update: " + updatedTopic);
             return;
         }
-        // Remove existing topic and add the updated one
-        this.mqttTopics.remove(existingTopic);
-        this.mqttTopics.add(updatedTopic);
-
         log.info("Topic updated: " + updatedTopic);
         this.unsubscribeTopic(existingTopic);
         this.addSubscription(updatedTopic);
