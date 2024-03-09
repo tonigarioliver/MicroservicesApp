@@ -12,5 +12,8 @@ public interface IDeviceService extends ICrudService<DeviceDto, DeviceRequestDto
     CompletableFuture<DeviceDto> getAsyncByManufactureCode(String manufactureCode);
 
     @Async
+    CompletableFuture<DevicesDto> getAsyncByDeviceModelSerialNumber(String manufactureCode);
+
+    @Async
     CompletableFuture<DeviceDto> getAsyncById(long id);
 }

@@ -3,8 +3,8 @@ package com.antonigari.iotdeviceservice.service.impl;
 import com.antonigari.iotdeviceservice.data.model.DeviceModel;
 import com.antonigari.iotdeviceservice.data.repository.DeviceModelRepository;
 import com.antonigari.iotdeviceservice.model.DeviceModelDto;
-import com.antonigari.iotdeviceservice.model.DeviceModelsDto;
 import com.antonigari.iotdeviceservice.model.DeviceModelRequestDto;
+import com.antonigari.iotdeviceservice.model.DeviceModelsDto;
 import com.antonigari.iotdeviceservice.service.IDeviceModelService;
 import com.antonigari.iotdeviceservice.service.exception.ServiceErrorCatalog;
 import lombok.AllArgsConstructor;
@@ -44,19 +44,29 @@ public class DeviceModelService implements IDeviceModelService {
     }
 
     @Override
+    public CompletableFuture<DeviceModelDto> getAsyncById(final long id) {
+        return CompletableFuture.supplyAsync(() ->
+                this.deviceModelRepository.findById(id)
+                        .map(device -> this.conversionService.convert(device, DeviceModelDto.class))
+                        .orElseThrow(() -> ServiceErrorCatalog
+                                .NOT_FOUND.exception("DeviceModel with ID " + id + " not found"))
+        );
+    }
+
+    @Override
     public DeviceModelDto create(final DeviceModelRequestDto deviceModelRequestDto) {
         this.deviceModelRepository.findBySerialNumber(deviceModelRequestDto.getSerialNumber())
                 .ifPresent(device -> {
                     throw ServiceErrorCatalog
                             .CONFLICT.exception("DeviceModel with serialNumber: " + deviceModelRequestDto.getSerialNumber() + " already exists");
                 });
-        DeviceModel newDeviceModel = this.conversionService.convert(deviceModelRequestDto, DeviceModel.class);
+        final DeviceModel newDeviceModel = this.conversionService.convert(deviceModelRequestDto, DeviceModel.class);
         return this.conversionService.convert(this.deviceModelRepository.save(newDeviceModel), DeviceModelDto.class);
     }
 
     @Override
     public DeviceModelDto update(final long deviceModelId, final DeviceModelRequestDto deviceModelRequestDto) {
-        DeviceModel existingDeviceModel = this.deviceModelRepository.findById(deviceModelId)
+        final DeviceModel existingDeviceModel = this.deviceModelRepository.findById(deviceModelId)
                 .orElseThrow(() -> ServiceErrorCatalog
                         .NOT_FOUND.exception("DeviceModel with ID " + deviceModelId + " not found"));
 
@@ -67,7 +77,7 @@ public class DeviceModelService implements IDeviceModelService {
 
     @Override
     public void delete(final long deviceModelId) {
-        DeviceModel deviceModelToDelete = this.deviceModelRepository.findById(deviceModelId)
+        final DeviceModel deviceModelToDelete = this.deviceModelRepository.findById(deviceModelId)
                 .orElseThrow(() -> ServiceErrorCatalog
                         .NOT_FOUND.exception("DeviceModel with ID " + deviceModelId + " not found"));
 

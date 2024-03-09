@@ -49,6 +49,16 @@ public class DeviceService implements IDeviceService {
     }
 
     @Override
+    @Async
+    public CompletableFuture<DevicesDto> getAsyncByDeviceModelSerialNumber(final String serialNumber) {
+        return CompletableFuture.completedFuture(DevicesDto.builder()
+                .devices(this.deviceRepository.findByDeviceModelSerialNumber(serialNumber).stream()
+                        .map(device -> this.conversionService.convert(device, DeviceDto.class))
+                        .toList())
+                .build());
+    }
+
+    @Override
     public CompletableFuture<DeviceDto> getAsyncById(final long id) {
         return CompletableFuture.supplyAsync(() ->
                 this.deviceRepository.findById(id)
