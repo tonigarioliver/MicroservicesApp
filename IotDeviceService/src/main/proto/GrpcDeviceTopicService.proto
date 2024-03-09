@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package DevicesTopicService;
+
+
+option java_multiple_files = true;
+option java_package = "com.antonigari.IotDeviceService";
+service GrpcDeviceTopicService {
+  rpc GetDevices(GetDevicesTopicRequest) returns (GetDevicesTopicResponse);
+}
+
+message GetDevicesTopicRequest {
+  // Define request fields if needed
+}
+
+message DeviceTopicGrpc {
+  int64 id = 1;
+  string topic = 2;
+  string manufactureCode = 3;
+}
+
+message GetDevicesTopicResponse {
+  repeated DeviceTopicGrpc deviceTopics = 1;
+}
