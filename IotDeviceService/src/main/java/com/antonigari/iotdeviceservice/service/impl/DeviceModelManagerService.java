@@ -7,6 +7,10 @@ import com.antonigari.iotdeviceservice.model.DeviceModelsDto;
 import com.antonigari.iotdeviceservice.model.DeviceTopicDto;
 import com.antonigari.iotdeviceservice.model.DevicesDto;
 import com.antonigari.iotdeviceservice.service.ICrudService;
+import com.antonigari.iotdeviceservice.service.IDeviceModelService;
+import com.antonigari.iotdeviceservice.service.IDeviceService;
+import com.antonigari.iotdeviceservice.service.IDeviceTopicService;
+import com.antonigari.iotdeviceservice.service.IKafkaProducerService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -22,10 +26,10 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class DeviceModelManagerService implements ICrudService<DeviceModelDto, DeviceModelRequestDto, DeviceModelRequestDto, DeviceModelsDto> {
-    private final KafkaProducerService kafkaProducerService;
-    private final DeviceTopicService deviceTopicService;
-    private final DeviceModelService deviceModelService;
-    private final DeviceService deviceService;
+    private final IKafkaProducerService kafkaProducerService;
+    private final IDeviceTopicService deviceTopicService;
+    private final IDeviceModelService deviceModelService;
+    private final IDeviceService deviceService;
 
     @Override
     @Async
