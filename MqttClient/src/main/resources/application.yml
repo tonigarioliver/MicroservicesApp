@@ -3,4 +3,10 @@ spring:
     active: dev
   main:
     web-application-type: none
+management:
+  security:
+    enabled: false
+security:
+  basic:
+    enabled: false
 

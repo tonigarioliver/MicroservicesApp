@@ -4,7 +4,7 @@ package DevicesTopicService;
 
 
 option java_multiple_files = true;
-option java_package = "com.antonigari.IotDeviceService";
+option java_package = "com.antonigari.MqttClient";
 service GrpcDeviceTopicService {
   rpc GetAllDeviceTopic(GetAllDeviceTopicRequest) returns (GetAllDeviceTopicResponse);
 }

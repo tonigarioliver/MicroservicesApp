@@ -1,8 +1,8 @@
 package com.antonigari.iotdeviceservice.service.impl;
 
 import com.antonigari.IotDeviceService.DeviceTopicGrpc;
-import com.antonigari.IotDeviceService.GetDevicesTopicRequest;
-import com.antonigari.IotDeviceService.GetDevicesTopicResponse;
+import com.antonigari.IotDeviceService.GetAllDeviceTopicRequest;
+import com.antonigari.IotDeviceService.GetAllDeviceTopicResponse;
 import com.antonigari.IotDeviceService.GrpcDeviceTopicServiceGrpc;
 import com.antonigari.iotdeviceservice.model.DeviceTopicsDto;
 import com.antonigari.iotdeviceservice.service.IDeviceTopicService;
@@ -16,9 +16,9 @@ public class GrpcDeviceTopicService extends GrpcDeviceTopicServiceGrpc.GrpcDevic
     private final IDeviceTopicService deviceTopicService;
 
     @Override
-    public void getDevices(final GetDevicesTopicRequest request, final StreamObserver<GetDevicesTopicResponse> responseObserver) {
+    public void getAllDeviceTopic(final GetAllDeviceTopicRequest request, final StreamObserver<GetAllDeviceTopicResponse> responseObserver) {
         final DeviceTopicsDto deviceTopics = this.deviceTopicService.getAllAsync().join();
-        final GetDevicesTopicResponse response = GetDevicesTopicResponse.newBuilder()
+        final GetAllDeviceTopicResponse response = GetAllDeviceTopicResponse.newBuilder()
                 .addAllDeviceTopics(deviceTopics.getDeviceTopics().stream()
                         .map(deviceTopic -> DeviceTopicGrpc.newBuilder()
                                 .setId(deviceTopic.getId())
@@ -32,3 +32,4 @@ public class GrpcDeviceTopicService extends GrpcDeviceTopicServiceGrpc.GrpcDevic
         responseObserver.onCompleted();
     }
 }
+

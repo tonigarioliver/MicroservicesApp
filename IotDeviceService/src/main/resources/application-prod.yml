@@ -14,3 +14,6 @@ spring:
     bootstrap-servers: kafka:9092
     consumer:
       group-id: iot-info-service
+grpc:
+  server:
+    port: 9090

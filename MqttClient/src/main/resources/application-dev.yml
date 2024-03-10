@@ -9,3 +9,7 @@ spring:
     consumer:
       group-id: iot-info-service
       topics: "new-device,delete-device,update-device"
+grpc:
+  server:
+    address: localhost
+    port: 9090

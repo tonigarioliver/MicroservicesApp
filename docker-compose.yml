@@ -12,6 +12,9 @@ services:
     volumes:
       - ./mosquitto/config:/mosquitto/config
     command: [ "sh", "-c", "cp /mosquitto/config/mosquitto_custom.conf /mosquitto/config/mosquitto.conf && exec mosquitto -c /mosquitto/config/mosquitto.conf" ]
+    networks:
+      - my-network
+
 
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
@@ -21,6 +24,8 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
     ports:
       - 2181:2181
+    networks:
+      - my-network
 
   kafka:
     image: confluentinc/cp-kafka:latest
@@ -36,6 +41,8 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - my-network
 
   postgres_db:
     image: postgres
@@ -49,6 +56,8 @@ services:
       POSTGRES_DB: microservices
     volumes:
       - local_pgdata:/var/lib/postgresql/data
+    networks:
+      - my-network
 
   pgadmin:
     image: dpage/pgadmin4
@@ -63,6 +72,8 @@ services:
       - postgres_db
     volumes:
       - pgadmin-data:/var/lib/pgadmin
+    networks:
+      - my-network
 
       #user_service:
       #container_name: user_service
@@ -70,8 +81,8 @@ services:
       #ports:
       #- "8000:8000"
 
-  iot_device_service:
-    container_name: iot_device_service
+  iotdeviceservice:
+    container_name: iotdeviceservice
     build: ./IotDeviceService
     restart: always
     ports:
@@ -79,14 +90,21 @@ services:
       - "9090:9090"
     depends_on:
       - postgres_db
+    networks:
+      - my-network
 
   mqtt_client_service:
     container_name: mqtt_client_service
     restart: always
     depends_on:
-      - iot_device_service
+      - iotdeviceservice
       - mqtt5
     build: ./MqttClient
+    networks:
+      - my-network
+networks:
+  my-network:
+    driver: bridge
 
 volumes:
   local_pgdata:

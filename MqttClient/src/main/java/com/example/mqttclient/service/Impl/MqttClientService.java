@@ -26,10 +26,12 @@ public class MqttClientService {
 
     private final MqttClientConfig mqttClientConfig;
     private final MqttCustomClient mqttCustomClient;
+    private final DeviceTopicService deviceTopicService;
     private final Set<MqttTopic> mqttTopics = new HashSet<>();
 
     @PostConstruct
     public void initialize() {
+        this.mqttTopics.addAll(this.deviceTopicService.getDeviceTopics());
         try {
             final CompletableFuture<Void> connectionFuture = this.mqttConnectAsync();
             connectionFuture.thenAccept(result -> {
@@ -49,6 +51,8 @@ public class MqttClientService {
             future.complete(null);
             final MqttMessageHandler listener = new MqttMessageHandler(this.mqttCustomClient);
             this.mqttCustomClient.getMqttClient().setCallback(listener);
+            this.mqttTopics.clear();
+            this.deviceTopicService.getDeviceTopics().forEach(this::addSubscription);
         } catch (final MqttException e) {
             log.error("Error en la conexión MQTT: " + e.getMessage(), e);
             future.completeExceptionally(e);
