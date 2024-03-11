@@ -31,7 +31,8 @@ public class MqttMessageHandler implements org.eclipse.paho.mqttv5.client.MqttCa
     public void messageArrived(final String topic, final MqttMessage message) throws Exception {
         final String messagePayload = new String(message.getPayload(), StandardCharsets.UTF_8);
         log.info("Received message on topic '{}': {}", topic, messagePayload);
-        this.mqttCustomClient.getMqttClient().publish(topic, message);
+        final MqttMessage reply = new MqttMessage(messagePayload.getBytes(StandardCharsets.UTF_8));
+        this.mqttCustomClient.getMqttClient().publish(topic, reply);
     }
 
     @Override
