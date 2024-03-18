@@ -1,0 +1,13 @@
+spring:
+  profiles:
+    active: dev
+server:
+  port: 8005
+management:
+  security:
+    enabled: false
+security:
+  basic:
+    enabled: false
+
+

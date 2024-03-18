@@ -1,5 +1,6 @@
 package com.antonigari.iotdeviceservice.service;
 
+import com.antonigari.iotdeviceservice.data.model.DeviceModel;
 import com.antonigari.iotdeviceservice.model.DeviceModelDto;
 import com.antonigari.iotdeviceservice.model.DeviceModelRequestDto;
 import com.antonigari.iotdeviceservice.model.DeviceModelsDto;
@@ -12,5 +13,5 @@ public interface IDeviceModelService extends ICrudService<DeviceModelDto, Device
     CompletableFuture<DeviceModelDto> getAsyncBySerialNumber(String serialNumber);
 
     @Async
-    CompletableFuture<DeviceModelDto> getAsyncById(long id);
+    CompletableFuture<DeviceModel> getAsyncById(long id);
 }

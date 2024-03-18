@@ -2,7 +2,8 @@ package com.antonigari.iotdeviceservice.service.impl;
 
 import com.antonigari.iotdeviceservice.configuration.kafka.MessageProducer;
 import com.antonigari.iotdeviceservice.data.model.KafkaMessage;
-import com.antonigari.iotdeviceservice.model.DeviceTopicDto;
+import com.antonigari.iotdeviceservice.data.model.KafkaProducerTopic;
+import com.antonigari.iotdeviceservice.model.DeviceMeasurementDto;
 import com.antonigari.iotdeviceservice.service.IKafkaProducerService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,11 +41,12 @@ public class KafkaProducerService implements IKafkaProducerService {
         }
     }
 
-    public boolean sendDeviceTopicMessageToKafka(final String topic, final DeviceTopicDto deviceTopic) {
+    @Override
+    public boolean sendDeviceMeasurementStatus(final KafkaProducerTopic topic, final DeviceMeasurementDto deviceMeasuremen) {
         try {
-            final String payload = this.objectMapper.writeValueAsString(deviceTopic);
+            final String payload = this.objectMapper.writeValueAsString(deviceMeasuremen);
             return this.sendMessage(KafkaMessage.builder()
-                    .topic(topic)
+                    .topic(topic.name())
                     .message(payload)
                     .build());
         } catch (final JsonProcessingException e) {

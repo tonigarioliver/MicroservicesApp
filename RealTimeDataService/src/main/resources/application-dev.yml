@@ -4,16 +4,17 @@ spring:
     username: admin
     password: postgres
     driver-class-name: org.postgresql.Driver
-  jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-    defer-datasource-initialization: true
-    hibernate:
-      ddl-auto: create
-    show-sql: true
   kafka:
     bootstrap-servers: localhost:29092
     consumer:
       group-id: iot-info-service
+      topics: "new-device,delete-device,update-device"
 grpc:
   server:
+    address: 127.0.0.1
     port: 9090
+mqtt:
+  server:
+    ip: tcp://localhost
+    port: 1883
+  qos: 1

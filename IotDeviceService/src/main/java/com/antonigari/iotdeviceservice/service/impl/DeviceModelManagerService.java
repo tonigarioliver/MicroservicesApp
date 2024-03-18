@@ -1,35 +1,31 @@
 package com.antonigari.iotdeviceservice.service.impl;
 
-import com.antonigari.iotdeviceservice.model.DeviceDto;
+import com.antonigari.iotdeviceservice.data.model.DeviceMeasurement;
+import com.antonigari.iotdeviceservice.data.model.DeviceModel;
+import com.antonigari.iotdeviceservice.data.model.KafkaProducerTopic;
+import com.antonigari.iotdeviceservice.model.DeviceMeasurementDto;
 import com.antonigari.iotdeviceservice.model.DeviceModelDto;
 import com.antonigari.iotdeviceservice.model.DeviceModelRequestDto;
 import com.antonigari.iotdeviceservice.model.DeviceModelsDto;
-import com.antonigari.iotdeviceservice.model.DeviceTopicDto;
-import com.antonigari.iotdeviceservice.model.DevicesDto;
 import com.antonigari.iotdeviceservice.service.ICrudService;
 import com.antonigari.iotdeviceservice.service.IDeviceModelService;
-import com.antonigari.iotdeviceservice.service.IDeviceService;
-import com.antonigari.iotdeviceservice.service.IDeviceTopicService;
 import com.antonigari.iotdeviceservice.service.IKafkaProducerService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
 @Slf4j
 public class DeviceModelManagerService implements ICrudService<DeviceModelDto, DeviceModelRequestDto, DeviceModelRequestDto, DeviceModelsDto> {
     private final IKafkaProducerService kafkaProducerService;
-    private final IDeviceTopicService deviceTopicService;
     private final IDeviceModelService deviceModelService;
-    private final IDeviceService deviceService;
+    private final ConversionService conversionService;
 
     @Override
     @Async
@@ -50,30 +46,27 @@ public class DeviceModelManagerService implements ICrudService<DeviceModelDto, D
     @Override
     public DeviceModelDto update(final long id, final DeviceModelRequestDto deviceModelRequestDto) {
         final DeviceModelDto deviceModelUpdated = this.deviceModelService.update(id, deviceModelRequestDto);
-        final DevicesDto devicesUpdated = this.deviceService.getAsyncByDeviceModelSerialNumber(deviceModelUpdated.getSerialNumber()).join();
-        final Map<DeviceDto, DeviceTopicDto> deviceToTopicsMap = devicesUpdated.getDevices().stream()
-                .collect(Collectors.toMap(
-                        Function.identity(),
-                        deviceUpdated -> this.deviceTopicService.getAsyncByManufactureCode(deviceUpdated.getManufactureCode()).join()
-                ));
-
-        deviceToTopicsMap.entrySet().stream()
-                .map(entry -> this.deviceTopicService.update(entry.getValue().getId(), entry.getKey()))
-                .forEach(topic -> this.kafkaProducerService.sendDeviceTopicMessageToKafka("update-device", topic));
-
+        final DeviceModel model = this.deviceModelService.getAsyncById(deviceModelUpdated.getDeviceModelId()).join();
+        final List<DeviceMeasurement> measurements = model.getDevices().stream()
+                .flatMap(device -> device.getDeviceMeasurements().stream())
+                .toList();
+        measurements.forEach(measure -> this.kafkaProducerService.sendDeviceMeasurementStatus(
+                KafkaProducerTopic.UPDATE_DEVICE_MEASUREMENT,
+                this.conversionService.convert(measure, DeviceMeasurementDto.class)
+        ));
         return deviceModelUpdated;
     }
 
     @Override
     public void delete(final long id) {
-        final DevicesDto devicesDto = this.deviceService.
-                getAsyncByDeviceModelSerialNumber(this.deviceModelService.getAsyncById(id).join().getSerialNumber()).join();
-        final List<DeviceTopicDto> deviceTopicsList = devicesDto.getDevices().stream()
-                .map(device -> this.deviceTopicService.getAsyncByManufactureCode(device.getManufactureCode()).join())
-                .toList();
-
+        final DeviceModel model = this.deviceModelService.getAsyncById(id).join();
         this.deviceModelService.delete(id);
-
-        deviceTopicsList.forEach(topic -> this.kafkaProducerService.sendDeviceTopicMessageToKafka("delete-device", topic));
+        final List<DeviceMeasurement> measurements = model.getDevices().stream()
+                .flatMap(device -> device.getDeviceMeasurements().stream())
+                .toList();
+        measurements.forEach(measure -> this.kafkaProducerService.sendDeviceMeasurementStatus(
+                KafkaProducerTopic.DELETE_DEVICE_MEASUREMENT,
+                this.conversionService.convert(measure, DeviceMeasurementDto.class)
+        ));
     }
 }

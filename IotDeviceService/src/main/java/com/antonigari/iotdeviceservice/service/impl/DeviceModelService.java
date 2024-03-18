@@ -44,10 +44,9 @@ public class DeviceModelService implements IDeviceModelService {
     }
 
     @Override
-    public CompletableFuture<DeviceModelDto> getAsyncById(final long id) {
+    public CompletableFuture<DeviceModel> getAsyncById(final long id) {
         return CompletableFuture.supplyAsync(() ->
                 this.deviceModelRepository.findById(id)
-                        .map(device -> this.conversionService.convert(device, DeviceModelDto.class))
                         .orElseThrow(() -> ServiceErrorCatalog
                                 .NOT_FOUND.exception("DeviceModel with ID " + id + " not found"))
         );
