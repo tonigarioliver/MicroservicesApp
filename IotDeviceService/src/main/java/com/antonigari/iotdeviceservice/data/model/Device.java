@@ -30,7 +30,7 @@ public class Device {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long deviceId;
-
+    
     @ManyToOne
     @JoinColumn(name = "deviceModelId", nullable = false)
     private DeviceModel deviceModel;

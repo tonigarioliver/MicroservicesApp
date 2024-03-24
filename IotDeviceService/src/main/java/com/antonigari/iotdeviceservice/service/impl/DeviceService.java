@@ -71,7 +71,7 @@ public class DeviceService implements IDeviceService {
         this.deviceRepository.findByManufactureCode(deviceRequestDto.getManufactureCode())
                 .ifPresent(device -> {
                     throw ServiceErrorCatalog
-                            .CONFLICT.exception("Device with serialNumber: " + deviceRequestDto.getManufactureCode() + " already exists");
+                            .CONFLICT.exception("Device with manufacture: " + deviceRequestDto.getManufactureCode() + " already exists");
                 });
         final DeviceModel deviceModel = this.deviceModelRepository.findById(deviceRequestDto.getDeviceModelId())
                 .orElseThrow(() -> ServiceErrorCatalog

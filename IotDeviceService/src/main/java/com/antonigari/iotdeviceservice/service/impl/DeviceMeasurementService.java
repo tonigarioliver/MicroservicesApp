@@ -69,6 +69,7 @@ public class DeviceMeasurementService implements IDeviceMeasurementService {
                         .getAsyncById(deviceMeasurementRequestDto.getMeasurementTypeId()).join())
                 .topic(topic)
                 .unit(deviceMeasurementRequestDto.getUnits())
+                .name(deviceMeasurementRequestDto.getMeasurementName())
                 .build();
         return this.conversionService
                 .convert(this.repository.save(newMeasure), DeviceMeasurementDto.class);
