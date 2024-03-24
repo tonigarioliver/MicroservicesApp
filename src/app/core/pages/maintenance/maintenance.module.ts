@@ -6,6 +6,7 @@ import { MaintenanceComponent } from './maintenance.component';
 import { DeviceModelModule } from 'src/app/core/components/device-model/device-model.module';
 import { PhysicalMeasurementModule } from 'src/app/core/components/physical-measurement/physical-measurement.module';
 import { DeviceModule } from 'src/app/core/components/device/device.module';
+import { DeviceMeasurementModule } from 'src/app/core/components/device-measurement/device-measurement/device-measurement.module';
 
 @NgModule({
   declarations: [
@@ -18,6 +19,7 @@ import { DeviceModule } from 'src/app/core/components/device/device.module';
     DeviceModelModule,
     PhysicalMeasurementModule,
     DeviceModule,
+    DeviceMeasurementModule,
   ]
 })
 export class MaintenanceModule { }

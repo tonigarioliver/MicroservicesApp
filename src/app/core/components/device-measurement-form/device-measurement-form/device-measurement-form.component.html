@@ -1,0 +1,23 @@
+<form [formGroup]="deviceMeasurementForm" (ngSubmit)="onSubmit()">
+  <div>
+    <label for="device">Device</label>
+    <select formControlName="device" id="device">
+      <option *ngFor="let device of devices" [ngValue]="device">{{ device.deviceModel.name }}</option>
+    </select>
+  </div>
+  <div>
+    <label for="name">Name</label>
+    <input type="text" formControlName="name" id="name">
+  </div>
+  <div>
+    <label for="unit">Unit</label>
+    <input type="text" formControlName="unit" id="unit">
+  </div>
+  <div>
+    <label for="measurementType">Measurement Type</label>
+    <select formControlName="measurementType" id="measurementType">
+      <option *ngFor="let type of measurementTypes" [ngValue]="type">{{ type.typeName }}</option>
+    </select>
+  </div>
+  <button type="submit" [disabled]="!deviceMeasurementForm.valid">Submit</button>
+</form>
