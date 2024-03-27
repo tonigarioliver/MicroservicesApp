@@ -29,6 +29,10 @@ public class DeviceMeasurementManagerService implements ICrudService<
         return this.deviceMeasurementService.getAllAsync();
     }
 
+    public CompletableFuture<DeviceMeasurementDto> getAsyncByTopic(final String topic) {
+        return this.deviceMeasurementService.getAsyncByTopic(topic);
+    }
+
     @Override
     public DeviceMeasurementDto create(final DeviceMeasurementRequestDto Ndto) {
         final DeviceMeasurementDto result = this.deviceMeasurementService.create(Ndto);

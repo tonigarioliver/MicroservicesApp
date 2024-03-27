@@ -14,15 +14,15 @@ public class DeviceMeasurementDtoConverterDeviceMeasurementGrpc implements Conve
     @Override
     public DeviceMeasurementGrpc convert(final DeviceMeasurementDto measure) {
         return DeviceMeasurementGrpc.newBuilder()
-                .setDeviceMeasurementId(measure.getDeviceMeasurementId())
-                .setTopic(measure.getTopic())
+                .setDeviceMeasurementId(measure.deviceMeasurementId())
+                .setTopic(measure.topic())
                 .setDevice(DeviceGrpc.newBuilder()
-                        .setDeviceId(measure.getDevice().getDeviceId())
-                        .setManufactureCode(measure.getDevice().getManufactureCode())
+                        .setDeviceId(measure.device().getDeviceId())
+                        .setManufactureCode(measure.device().getManufactureCode())
                         .build())
                 .setMeasurementType(MeasurementTypeGrpc.newBuilder()
-                        .setMeasurementTypeId(measure.getMeasurementType().getMeasurementTypeId())
-                        .setTypeName(this.getGrpcMeasurementTypeName(measure.getMeasurementType().getTypeName()))
+                        .setMeasurementTypeId(measure.measurementType().getMeasurementTypeId())
+                        .setTypeName(this.getGrpcMeasurementTypeName(measure.measurementType().getTypeName()))
                         .build())
                 .build();
     }
