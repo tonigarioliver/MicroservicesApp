@@ -4,5 +4,5 @@ import lombok.Builder;
 
 @Builder
 public record DeviceMeasurementDto(Long deviceMeasurementId, DeviceDto device, MeasurementTypeDto measurementType,
-                                   String topic, String name, String units) {
+                                   String topic, String name, String unit) {
 }

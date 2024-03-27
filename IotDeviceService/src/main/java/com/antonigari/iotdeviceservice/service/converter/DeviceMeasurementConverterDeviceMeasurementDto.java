@@ -27,6 +27,8 @@ public class DeviceMeasurementConverterDeviceMeasurementDto implements Converter
                 .measurementType(this.
                         conversionService.convert(deviceMeasurement.getMeasurementType(), MeasurementTypeDto.class))
                 .topic(deviceMeasurement.getTopic())
+                .name(deviceMeasurement.getName())
+                .unit(deviceMeasurement.getUnit())
                 .build();
     }
 }
