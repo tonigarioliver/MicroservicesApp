@@ -2,7 +2,7 @@
   <div>
     <label for="device">Device</label>
     <select formControlName="device" id="device">
-      <option *ngFor="let device of devices" [ngValue]="device">{{ device.deviceModel.name }}</option>
+      <option *ngFor="let device of devices" [ngValue]="device.deviceId">{{ device.deviceModel.name }}</option>
     </select>
   </div>
   <div>
@@ -16,7 +16,7 @@
   <div>
     <label for="measurementType">Measurement Type</label>
     <select formControlName="measurementType" id="measurementType">
-      <option *ngFor="let type of measurementTypes" [ngValue]="type">{{ type.typeName }}</option>
+      <option *ngFor="let type of measurementTypes" [ngValue]="type.measurementTypeId">{{ type.typeName }}</option>
     </select>
   </div>
   <button type="submit" [disabled]="!deviceMeasurementForm.valid">Submit</button>

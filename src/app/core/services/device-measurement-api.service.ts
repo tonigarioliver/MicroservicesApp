@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { DeviceMeasurement } from 'src/app/core/models/device-measurement';
+import { DeviceMeasurementRequest } from 'src/app/core/models/device-measurement-request';
 
 @Injectable({
   providedIn: 'root'
@@ -22,17 +23,17 @@ export class DeviceMeasurementApiService {
   }
 
   // Crear una nueva medición de dispositivo
-  createDeviceMeasurement(deviceMeasurement: DeviceMeasurement): Observable<DeviceMeasurement> {
-    return this.http.post<{ deviceMeasurement: DeviceMeasurement }>(this.baseUrl, deviceMeasurement)
+  createDeviceMeasurement(request: DeviceMeasurementRequest): Observable<DeviceMeasurement> {
+    return this.http.post<{ deviceMeasurement: DeviceMeasurement }>(this.baseUrl, request)
       .pipe(
         map(response => response.deviceMeasurement)
       );
   }
 
   // Actualizar una medición de dispositivo existente
-  updateDeviceMeasurement(deviceMeasurement: DeviceMeasurement): Observable<DeviceMeasurement> {
-    const url = `${this.baseUrl}/${deviceMeasurement.deviceMeasurementId}`;
-    return this.http.put<{ deviceMeasurement: DeviceMeasurement }>(url, deviceMeasurement)
+  updateDeviceMeasurement(request: DeviceMeasurementRequest): Observable<DeviceMeasurement> {
+    const url = `${this.baseUrl}/${request.deviceMeasurementId}`;
+    return this.http.put<{ deviceMeasurement: DeviceMeasurement }>(url, request)
       .pipe(
         map(response => response.deviceMeasurement)
       );

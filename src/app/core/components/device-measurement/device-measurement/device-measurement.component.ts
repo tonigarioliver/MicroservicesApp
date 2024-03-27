@@ -4,8 +4,10 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { DeviceFormComponent } from 'src/app/core/components/device-form/device-form.component';
+import { DeviceMeasurementFormComponent } from 'src/app/core/components/device-measurement-form/device-measurement-form/device-measurement-form.component';
 import { Device } from 'src/app/core/models/device';
 import { DeviceMeasurement } from 'src/app/core/models/device-measurement';
+import { DeviceMeasurementRequest } from 'src/app/core/models/device-measurement-request';
 import { DeviceRequest } from 'src/app/core/models/device-request';
 import { DeviceMeasurementApiService } from 'src/app/core/services/device-measurement-api.service';
 
@@ -16,9 +18,8 @@ import { DeviceMeasurementApiService } from 'src/app/core/services/device-measur
 })
 export class DeviceMeasurementComponent implements OnInit {
 
-  displayedColumns: string[] = ['deviceModel', 'manufactureDate', 'price', 'manufactureCode', 'actions'];
+  displayedColumns: string[] = ['measurementName', 'measurementUnit', 'measurementTopic', 'measurementType', 'measurementDevice'];
   tableData = new MatTableDataSource<DeviceMeasurement>();
-
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
@@ -41,18 +42,18 @@ export class DeviceMeasurementComponent implements OnInit {
     );
   }
 
-  addDevice(): void {
-    const deviceRequest: DeviceRequest = {
+  addMeasurement(): void {
+    const request: DeviceMeasurementRequest = {
+      deviceMeasurementId: null,
       deviceId: null,
-      deviceModelId: 0,
-      manufactureCode: '',
-      price: null,
-      manufactureDate: (new Date())
+      name: '',
+      unit: '',
+      measurementTypeId: null
     };
     const isEditMode = false
-    const dialogRef = this.deviceDialog.open(DeviceFormComponent, {
+    const dialogRef = this.deviceDialog.open(DeviceMeasurementFormComponent, {
       width: '400px',
-      data: { deviceRequest, isEditMode },
+      data: { request, isEditMode },
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -60,18 +61,18 @@ export class DeviceMeasurementComponent implements OnInit {
     });
   }
 
-  editDevice(device: Device): void {
-    const deviceRequest: DeviceRequest = {
-      deviceId: device.deviceId,
-      deviceModelId: device.deviceModel.deviceModelId,
-      manufactureCode: device.manufactureCode,
-      price: device.price,
-      manufactureDate: device.manufactureDate
+  editMeasurement(measurement: DeviceMeasurement): void {
+    const request: DeviceMeasurementRequest = {
+      deviceMeasurementId: measurement.deviceMeasurementId,
+      deviceId: measurement.device.deviceId,
+      name: measurement.name,
+      unit: measurement.unit,
+      measurementTypeId: measurement.measurementType.measurementTypeId
     };
     const isEditMode = true
-    const dialogRef = this.deviceDialog.open(DeviceFormComponent, {
+    const dialogRef = this.deviceDialog.open(DeviceMeasurementFormComponent, {
       width: '400px',
-      data: { deviceRequest, isEditMode },
+      data: { request, isEditMode },
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -79,14 +80,14 @@ export class DeviceMeasurementComponent implements OnInit {
     });
   }
 
-  deleteDevice(device: Device): void {
-    this.deviceMeasurementApiService.deleteDeviceMeasurement(device.deviceId)
+  deleteMeasurement(measurement: DeviceMeasurement): void {
+    this.deviceMeasurementApiService.deleteDeviceMeasurement(measurement.deviceMeasurementId)
       .subscribe(
         () => {
           this.fetchDeviceMeasurements();
         },
         (error) => {
-          console.error('Error deleting device model:', error);
+          console.error('Error deleting measurement:', error);
         }
       );
   }
