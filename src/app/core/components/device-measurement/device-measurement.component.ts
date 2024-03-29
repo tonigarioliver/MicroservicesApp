@@ -4,7 +4,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { DeviceFormComponent } from 'src/app/core/components/device-form/device-form.component';
-import { DeviceMeasurementFormComponent } from 'src/app/core/components/device-measurement-form/device-measurement-form/device-measurement-form.component';
+import { DeviceMeasurementFormComponent } from 'src/app/core/components/device-measurement-form/device-measurement-form.component';
 import { Device } from 'src/app/core/models/device';
 import { DeviceMeasurement } from 'src/app/core/models/device-measurement';
 import { DeviceMeasurementRequest } from 'src/app/core/models/device-measurement-request';
@@ -34,10 +34,11 @@ export class DeviceMeasurementComponent implements OnInit {
   fetchDeviceMeasurements(): void {
     this.deviceMeasurementApiService.getDeviceMeasurements().subscribe(
       (deviceMeasurements: DeviceMeasurement[]) => {
+        console.debug(deviceMeasurements)
         this.tableData.data = deviceMeasurements;
       },
       (error) => {
-        console.error('Error fetching device models:', error);
+        console.error('Error fetching device deviceMeasurement:', error);
       }
     );
   }

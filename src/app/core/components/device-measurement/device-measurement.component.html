@@ -18,7 +18,7 @@
 
     <ng-container matColumnDef="measurementType">
       <th mat-header-cell *matHeaderCellDef mat-sort-header> Measure Type </th>
-      <td mat-cell *matCellDef="let deviceMeasurement"> {{ deviceMeasurement.deviceMeasurement.typeName }} </td>
+      <td mat-cell *matCellDef="let deviceMeasurement"> {{ deviceMeasurement.measurementType.typeName }} </td>
     </ng-container>
 
     <ng-container matColumnDef="measurementDevice">

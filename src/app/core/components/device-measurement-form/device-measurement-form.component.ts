@@ -33,11 +33,10 @@ export class DeviceMeasurementFormComponent implements OnInit {
     this.isEditMode = dialogData.isEditMode
     this.request = dialogData.request;
     this.deviceMeasurementForm = this.fb.group({
-      deviceMeasurementId: [null],
-      deviceId: [null, Validators.required],
-      name: ['', Validators.required],
-      unit: ['', Validators.required],
-      measurementTypeId: [null, Validators.required]
+      device: [null, Validators.required],
+      measurementName: ['', Validators.required],
+      units: ['', Validators.required],
+      measurementType: [null, Validators.required]
     });
   }
 
@@ -45,10 +44,10 @@ export class DeviceMeasurementFormComponent implements OnInit {
     this.deviceApiService.getDevices().subscribe(devices => this.devices = devices);
     this.measurementTypeApiService.getMeasurementTypes().subscribe(types => this.measurementTypes = types);
     this.deviceMeasurementForm = this.fb.group({
-      device: [this.getFirstMatchingDevice, [Validators.required]],
-      name: [this.request.name, [Validators.required]],
-      unit: [this.request.unit, [Validators.required]],
-      measurementType: [this.getFirstMatchingMeasurementTypes, [Validators.required]],
+      deviceId: [this.getFirstMatchingDevice, [Validators.required]],
+      measurementName: [this.request.name, [Validators.required]],
+      units: [this.request.unit, [Validators.required]],
+      measurementTypeId: [this.getFirstMatchingMeasurementTypes, [Validators.required]],
     })
   }
 
@@ -56,17 +55,8 @@ export class DeviceMeasurementFormComponent implements OnInit {
 
     const formData: DeviceMeasurementRequest = {
       ...this.deviceMeasurementForm.value,
-      deviceMeasurementId: this.request.deviceMeasurementId
-    };
-    /*
-    const request: DeviceMeasurementRequest = {
       deviceMeasurementId: this.request.deviceMeasurementId,
-      deviceId: this.deviceMeasurementForm.value.device.deviceId,
-      name: this.deviceMeasurementForm.value.
-      manufactureCode: this.deviceForm.value.manufactureCode,
-      price: this.deviceForm.value.price,
-      manufactureDate: this.deviceForm.value.manufactureDate.toISOString()
-    };*/
+    };
     if (this.isEditMode) {
       this.deviceMeasurementApiService.updateDeviceMeasurement(formData).subscribe(
         response => {
