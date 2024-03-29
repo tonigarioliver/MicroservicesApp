@@ -18,7 +18,7 @@ import { DeviceMeasurementApiService } from 'src/app/core/services/device-measur
 })
 export class DeviceMeasurementComponent implements OnInit {
 
-  displayedColumns: string[] = ['measurementName', 'measurementUnit', 'measurementTopic', 'measurementType', 'measurementDevice'];
+  displayedColumns: string[] = ['measurementName', 'measurementUnit', 'measurementTopic', 'measurementType', 'measurementDevice', 'actions'];
   tableData = new MatTableDataSource<DeviceMeasurement>();
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
