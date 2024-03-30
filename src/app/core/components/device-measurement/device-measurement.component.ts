@@ -7,6 +7,7 @@ import { DeviceMeasurementFormComponent } from 'src/app/core/components/device-m
 import { DeviceMeasurement } from 'src/app/core/models/device-measurement';
 import { DeviceMeasurementRequest } from 'src/app/core/models/device-measurement-request';
 import { DeviceMeasurementApiService } from 'src/app/core/services/api/device-measurement-api.service';
+import { ToastService } from 'src/app/core/services/toast.service';
 
 @Component({
   selector: 'app-device-measurement',
@@ -20,7 +21,11 @@ export class DeviceMeasurementComponent implements OnInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  constructor(private deviceMeasurementApiService: DeviceMeasurementApiService, private deviceDialog: MatDialog) { }
+  constructor(
+    private deviceMeasurementApiService: DeviceMeasurementApiService,
+    private deviceDialog: MatDialog,
+    private toastService: ToastService
+  ) { }
 
   ngOnInit(): void {
     this.tableData.paginator = this.paginator;
@@ -35,7 +40,7 @@ export class DeviceMeasurementComponent implements OnInit {
         this.tableData.data = deviceMeasurements;
       },
       (error) => {
-        console.error('Error fetching device deviceMeasurement:', error);
+        this.toastService.showError(error)
       }
     );
   }
@@ -85,7 +90,7 @@ export class DeviceMeasurementComponent implements OnInit {
           this.fetchDeviceMeasurements();
         },
         (error) => {
-          console.error('Error deleting measurement:', error);
+          this.toastService.showError(error)
         }
       );
   }

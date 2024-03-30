@@ -4,7 +4,6 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DeviceModelRequest } from 'src/app/core/models/device-model-request';
 import { DeviceModelApiService } from 'src/app/core/services/api/device-model-api.service';
 
-
 @Component({
   selector: 'app-create-device-model',
   templateUrl: './device-model-form.component.html',
@@ -44,14 +43,12 @@ export class DeviceModelFormComponent {
     if (this.isEditMode) {
       this.deviceModelApiService.updateDeviceModelRequest(this.deviceModelRequest).subscribe(
         response => {
-          console.log('Respuesta exitosa:', response);
           this.dialogRef.close()
         },
       )
     } else {
       this.deviceModelApiService.createDeviceModelRequest(this.deviceModelRequest).subscribe(
         response => {
-          console.log('Respuesta exitosa:', response);
           this.dialogRef.close()
         },
       )

@@ -8,6 +8,7 @@ import { DeviceMeasurement } from 'src/app/core/models/device-measurement';
 import { DeviceMeasurementRequest } from 'src/app/core/models/device-measurement-request';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { DeviceMeasurementApiService } from 'src/app/core/services/api/device-measurement-api.service';
+import { ToastService } from 'src/app/core/services/toast.service';
 
 @Component({
   selector: 'app-device-measurement-form',
@@ -28,7 +29,8 @@ export class DeviceMeasurementFormComponent implements OnInit {
     private fb: FormBuilder,
     private deviceMeasurementApiService: DeviceMeasurementApiService,
     private deviceApiService: DeviceApiService,
-    private measurementTypeApiService: MeasurementTypeApiService
+    private measurementTypeApiService: MeasurementTypeApiService,
+    private toastService: ToastService,
   ) {
     this.isEditMode = dialogData.isEditMode
     this.request = dialogData.request;
@@ -60,21 +62,19 @@ export class DeviceMeasurementFormComponent implements OnInit {
     if (this.isEditMode) {
       this.deviceMeasurementApiService.updateDeviceMeasurement(formData).subscribe(
         response => {
-          console.log('Respuesta exitosa:', response);
           this.dialogRef.close();
         },
         error => {
-          console.error('Error al actualizar el dispositivo:', error);
+          this.toastService.showError(error)
         }
       );
     } else {
       this.deviceMeasurementApiService.createDeviceMeasurement(formData).subscribe(
         response => {
-          console.log('Respuesta exitosa:', response);
           this.dialogRef.close();
         },
         error => {
-          console.error('Error al crear el dispositivo:', error);
+          this.toastService.showError(error)
         }
       );
     }

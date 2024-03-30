@@ -6,6 +6,7 @@ import { DeviceModel } from 'src/app/core/models/device-model';
 import { DeviceRequest } from 'src/app/core/models/device-request';
 import { DeviceApiService } from 'src/app/core/services/api/device-api.service';
 import { DeviceModelApiService } from 'src/app/core/services/api/device-model-api.service';
+import { ToastService } from 'src/app/core/services/toast.service';
 
 @Component({
   selector: 'app-device-form',
@@ -33,7 +34,8 @@ export class DeviceFormComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public dialogData: { deviceRequest: DeviceRequest; isEditMode: boolean },
     private deviceApiService: DeviceApiService,
     private formBuilder: FormBuilder,
-    private deviceModelApiService: DeviceModelApiService
+    private deviceModelApiService: DeviceModelApiService,
+    private toastService: ToastService,
   ) {
     this.deviceRequest = dialogData.deviceRequest;
     this.isEditMode = dialogData.isEditMode
@@ -66,7 +68,7 @@ export class DeviceFormComponent implements OnInit {
         this.deviceModels = deviceModels;
       },
       (error) => {
-        console.error('Error fetching device models:', error);
+        this.toastService.showError(error)
       }
     );
   }
@@ -84,21 +86,19 @@ export class DeviceFormComponent implements OnInit {
     if (this.isEditMode) {
       this.deviceApiService.updateDeviceRequest(request).subscribe(
         response => {
-          console.log('Respuesta exitosa:', response);
           this.dialogRef.close();
         },
         error => {
-          console.error('Error al actualizar el dispositivo:', error);
+          this.toastService.showError(error)
         }
       );
     } else {
       this.deviceApiService.createDeviceRequest(request).subscribe(
         response => {
-          console.log('Respuesta exitosa:', response);
           this.dialogRef.close();
         },
         error => {
-          console.error('Error al crear el dispositivo:', error);
+          this.toastService.showError(error)
         }
       );
     }

@@ -7,6 +7,7 @@ import { DeviceModelApiService } from 'src/app/core/services/api/device-model-ap
 import { MatDialog } from '@angular/material/dialog';
 import { DeviceModelFormComponent } from 'src/app/core/components/device-model-form/device-model-form.component';
 import { DeviceModelRequest } from 'src/app/core/models/device-model-request';
+import { ToastService } from 'src/app/core/services/toast.service';
 
 @Component({
   selector: 'app-device-model',
@@ -20,7 +21,11 @@ export class DeviceModelComponent implements OnInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  constructor(private deviceModelApiService: DeviceModelApiService, private deviceModelDialog: MatDialog) { }
+  constructor(
+    private deviceModelApiService: DeviceModelApiService,
+    private deviceModelDialog: MatDialog,
+    private toastService: ToastService,
+  ) { }
 
   ngOnInit(): void {
     this.tableData.paginator = this.paginator;
@@ -34,7 +39,7 @@ export class DeviceModelComponent implements OnInit {
         this.tableData.data = deviceModels;
       },
       (error) => {
-        console.error('Error fetching device models:', error);
+        this.toastService.showError(error)
       }
     );
   }
@@ -80,7 +85,7 @@ export class DeviceModelComponent implements OnInit {
           this.fetchDeviceModels();
         },
         (error) => {
-          console.error('Error deleting device model:', error);
+          this.toastService.showError(error)
         }
       );
   }
