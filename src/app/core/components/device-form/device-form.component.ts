@@ -68,7 +68,7 @@ export class DeviceFormComponent implements OnInit {
         this.deviceModels = deviceModels;
       },
       (error) => {
-        this.toastService.showError(error)
+        this.toastService.showError(error.message)
       }
     );
   }
@@ -89,7 +89,7 @@ export class DeviceFormComponent implements OnInit {
           this.dialogRef.close();
         },
         error => {
-          this.toastService.showError(error)
+          this.toastService.showError(error.message)
         }
       );
     } else {
@@ -98,7 +98,7 @@ export class DeviceFormComponent implements OnInit {
           this.dialogRef.close();
         },
         error => {
-          this.toastService.showError(error)
+          this.toastService.showError(error.message)
         }
       );
     }

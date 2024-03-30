@@ -39,7 +39,7 @@ export class DeviceModelComponent implements OnInit {
         this.tableData.data = deviceModels;
       },
       (error) => {
-        this.toastService.showError(error)
+        this.toastService.showError(error.message)
       }
     );
   }
@@ -85,7 +85,7 @@ export class DeviceModelComponent implements OnInit {
           this.fetchDeviceModels();
         },
         (error) => {
-          this.toastService.showError(error)
+          this.toastService.showError(error.message)
         }
       );
   }

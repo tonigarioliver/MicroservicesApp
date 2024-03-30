@@ -65,7 +65,7 @@ export class DeviceMeasurementFormComponent implements OnInit {
           this.dialogRef.close();
         },
         error => {
-          this.toastService.showError(error)
+          this.toastService.showError(error.message)
         }
       );
     } else {
@@ -74,7 +74,7 @@ export class DeviceMeasurementFormComponent implements OnInit {
           this.dialogRef.close();
         },
         error => {
-          this.toastService.showError(error)
+          this.toastService.showError(error.message)
         }
       );
     }

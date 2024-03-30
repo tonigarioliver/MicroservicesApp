@@ -40,7 +40,7 @@ export class DeviceComponent implements OnInit {
         this.tableData.data = devices;
       },
       (error) => {
-        this.toastService.showError(error)
+        this.toastService.showError(error.message)
       }
     );
   }
@@ -90,7 +90,7 @@ export class DeviceComponent implements OnInit {
           this.fetchDevices();
         },
         (error) => {
-          this.toastService.showError(error)
+          this.toastService.showError(error.message)
         }
       );
   }
