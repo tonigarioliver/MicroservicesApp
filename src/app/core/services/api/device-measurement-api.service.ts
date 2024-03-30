@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { DeviceMeasurement } from 'src/app/core/models/device-measurement';
 import { DeviceMeasurementRequest } from 'src/app/core/models/device-measurement-request';
+import { DeviceMeasurementDetails } from 'src/app/core/models/device-measurement-details';
 
 @Injectable({
   providedIn: 'root'
@@ -36,6 +37,14 @@ export class DeviceMeasurementApiService {
     return this.http.put<{ deviceMeasurement: DeviceMeasurement }>(url, request)
       .pipe(
         map(response => response.deviceMeasurement)
+      );
+  }
+
+  getDeviceMeasurementDetails(deviceMeasurementId: number): Observable<DeviceMeasurementDetails> {
+    const url = `${this.baseUrl}/${deviceMeasurementId}/details`;
+    return this.http.get<{ deviceMeasurementDetails: DeviceMeasurementDetails }>(url)
+      .pipe(
+        map(response => response.deviceMeasurementDetails)
       );
   }
 
