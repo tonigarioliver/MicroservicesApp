@@ -1,3 +1,12 @@
-h1{
-    color: aqua;
+h1 {
+  color: aqua;
+}
+
+.success-toast {
+  background-color: green;
+}
+
+/* Estilos para el toast de error */
+.error-toast {
+  background-color: red;
 }

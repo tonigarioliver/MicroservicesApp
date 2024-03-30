@@ -2,6 +2,7 @@ import { Component, ViewChild, OnInit } from '@angular/core';
 import { MatSidenav } from '@angular/material/sidenav';
 import { Router } from '@angular/router';
 import { DeviceMeasurementComponent } from 'src/app/core/components/device-measurement/device-measurement.component';
+import { DeviceModelComponent } from 'src/app/core/components/device-model/device-model.component';
 import { DeviceComponent } from 'src/app/core/components/device/device.component';
 import { DashboardComponent } from 'src/app/core/pages/dashboard/dashboard.component';
 interface ComponentToShow {
@@ -19,7 +20,7 @@ export class SidenavDashboardComponent {
   componentsToShow: ComponentToShow[] = [
     { name: 'device-measurement', component: DeviceMeasurementComponent, visible: false },
     { name: 'devices', component: DeviceComponent, visible: false },
-    { name: 'device-models', component: DeviceComponent, visible: false },
+    { name: 'device-models', component: DeviceModelComponent, visible: false },
   ];
   isMenuOpen = false;
 
