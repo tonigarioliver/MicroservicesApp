@@ -1,0 +1,28 @@
+<div class="sidebar-container">
+  <mat-drawer-container autosize>
+    <mat-drawer #drawer opened="true" mode="side" position="start" [opened]="isMenuOpen">
+      <mat-nav-list>
+        <mat-list-item (click)="loadComponent('device-measurement')">
+          <button mat-button>Device Measurement</button>
+        </mat-list-item>
+        <mat-list-item (click)="loadComponent('devices')">
+          <button mat-button> Devices </button>
+        </mat-list-item>
+        <mat-list-item (click)="loadComponent('device-models')">
+          <button mat-button> Devices Models </button>
+        </mat-list-item>
+        <!-- Agrega más elementos del menú según sea necesario -->
+      </mat-nav-list>
+    </mat-drawer>
+    <mat-drawer-content>
+      <div style="text-align: center; min-height: 600px;">
+        <ng-container *ngFor="let component of componentsToShow">
+          <ng-container *ngIf="component.visible">
+            <ng-container *ngComponentOutlet="component.component"></ng-container>
+          </ng-container>
+        </ng-container>
+      </div>
+    </mat-drawer-content>
+  </mat-drawer-container>
+
+</div>
