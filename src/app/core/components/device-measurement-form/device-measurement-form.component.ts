@@ -1,13 +1,13 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { DeviceApiService } from 'src/app/core/services/device-api.service';
+import { DeviceApiService } from 'src/app/core/services/api/device-api.service';
 import { Device } from 'src/app/core/models/device';
 import { MeasurementType } from 'src/app/core/models/measurement-type';
-import { MeasurementTypeApiService } from 'src/app/core/services/measurement-type-api.service';
+import { MeasurementTypeApiService } from 'src/app/core/services/api/measurement-type-api.service';
 import { DeviceMeasurement } from 'src/app/core/models/device-measurement';
 import { DeviceMeasurementRequest } from 'src/app/core/models/device-measurement-request';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { DeviceMeasurementApiService } from 'src/app/core/services/device-measurement-api.service';
+import { DeviceMeasurementApiService } from 'src/app/core/services/api/device-measurement-api.service';
 
 @Component({
   selector: 'app-device-measurement-form',

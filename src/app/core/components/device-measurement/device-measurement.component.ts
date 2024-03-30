@@ -3,13 +3,10 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { DeviceFormComponent } from 'src/app/core/components/device-form/device-form.component';
 import { DeviceMeasurementFormComponent } from 'src/app/core/components/device-measurement-form/device-measurement-form.component';
-import { Device } from 'src/app/core/models/device';
 import { DeviceMeasurement } from 'src/app/core/models/device-measurement';
 import { DeviceMeasurementRequest } from 'src/app/core/models/device-measurement-request';
-import { DeviceRequest } from 'src/app/core/models/device-request';
-import { DeviceMeasurementApiService } from 'src/app/core/services/device-measurement-api.service';
+import { DeviceMeasurementApiService } from 'src/app/core/services/api/device-measurement-api.service';
 
 @Component({
   selector: 'app-device-measurement',

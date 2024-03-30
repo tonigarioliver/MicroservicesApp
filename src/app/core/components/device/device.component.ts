@@ -6,7 +6,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { DeviceFormComponent } from 'src/app/core/components/device-form/device-form.component';
 import { Device } from 'src/app/core/models/device';
 import { DeviceRequest } from 'src/app/core/models/device-request';
-import { DeviceApiService } from 'src/app/core/services/device-api.service';
+import { DeviceApiService } from 'src/app/core/services/api/device-api.service';
 
 @Component({
   selector: 'app-device',

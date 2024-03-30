@@ -4,8 +4,8 @@ import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { DeviceModel } from 'src/app/core/models/device-model';
 import { DeviceRequest } from 'src/app/core/models/device-request';
-import { DeviceApiService } from 'src/app/core/services/device-api.service';
-import { DeviceModelApiService } from 'src/app/core/services/device-model-api.service';
+import { DeviceApiService } from 'src/app/core/services/api/device-api.service';
+import { DeviceModelApiService } from 'src/app/core/services/api/device-model-api.service';
 
 @Component({
   selector: 'app-device-form',

@@ -2,7 +2,7 @@ import { Component, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DeviceModelRequest } from 'src/app/core/models/device-model-request';
-import { DeviceModelApiService } from 'src/app/core/services/device-model-api.service';
+import { DeviceModelApiService } from 'src/app/core/services/api/device-model-api.service';
 
 
 @Component({
@@ -12,7 +12,7 @@ import { DeviceModelApiService } from 'src/app/core/services/device-model-api.se
 })
 export class DeviceModelFormComponent {
   deviceModelRequest: DeviceModelRequest = {
-    deviceModelId:0,
+    deviceModelId: 0,
     name: '',
     serialNumber: ''
   };
@@ -38,8 +38,8 @@ export class DeviceModelFormComponent {
   saveChangesDialog(): void {
     this.deviceModelRequest = {
       ...this.deviceModelRequest,
-      deviceModelId: this.deviceModelRequest.deviceModelId, 
-      ...this.deviceModelForm.value  
+      deviceModelId: this.deviceModelRequest.deviceModelId,
+      ...this.deviceModelForm.value
     };
     if (this.isEditMode) {
       this.deviceModelApiService.updateDeviceModelRequest(this.deviceModelRequest).subscribe(

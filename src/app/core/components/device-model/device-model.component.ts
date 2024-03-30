@@ -3,7 +3,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { DeviceModel } from 'src/app/core/models/device-model';
-import { DeviceModelApiService } from 'src/app/core/services/device-model-api.service';
+import { DeviceModelApiService } from 'src/app/core/services/api/device-model-api.service';
 import { MatDialog } from '@angular/material/dialog';
 import { DeviceModelFormComponent } from 'src/app/core/components/device-model-form/device-model-form.component';
 import { DeviceModelRequest } from 'src/app/core/models/device-model-request';
