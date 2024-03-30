@@ -4,13 +4,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { SidenavDashboardComponent } from 'src/app/core/components/sidenav-dashboard/sidenav-dashboard.component';
-import { RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DeviceMeasurementModule } from 'src/app/core/components/device-measurement/device-measurement.module';
-
-
+import { DeviceModelModule } from 'src/app/core/components/device-model/device-model.module';
+import { DeviceModule } from 'src/app/core/components/device/device.module';
 
 
 @NgModule({
@@ -20,15 +17,13 @@ import { DeviceMeasurementModule } from 'src/app/core/components/device-measurem
   ,
   imports: [
     CommonModule,
-    MatSidenavModule,
     MatIconModule,
-    MatSidenavModule,
     MatListModule,
-    RouterModule,
     MatIconModule,
     MatButtonModule,
-    MatToolbarModule,
     MatSidenavModule,
+    DeviceModule,
+    DeviceModelModule,
     DeviceMeasurementModule
   ],
   exports: [

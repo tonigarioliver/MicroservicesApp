@@ -6,11 +6,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { SidenavDashboardModule } from 'src/app/core/components/sidenav-dashboard/sidenav-dashboard.module';
-import { MatListModule } from '@angular/material/list';
-import { MatSidenavModule } from '@angular/material/sidenav';
-import { RouterModule } from '@angular/router';
-
-
 
 
 @NgModule({
@@ -21,16 +16,10 @@ import { RouterModule } from '@angular/router';
     CommonModule,
     DashboardRoutingModule,
     SidenavDashboardModule,
-    MatSidenavModule,
     MatIconModule,
-    MatSidenavModule,
-    MatListModule,
-    RouterModule,
     MatIconModule,
     MatButtonModule,
     MatToolbarModule,
-    MatSidenavModule,
-
   ], exports: [
     DashboardComponent
   ]
