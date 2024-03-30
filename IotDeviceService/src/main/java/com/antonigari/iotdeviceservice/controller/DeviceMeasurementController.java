@@ -1,6 +1,7 @@
 package com.antonigari.iotdeviceservice.controller;
 
 
+import com.antonigari.iotdeviceservice.model.DeviceMeasurementDetailsDto;
 import com.antonigari.iotdeviceservice.model.DeviceMeasurementDto;
 import com.antonigari.iotdeviceservice.model.DeviceMeasurementRequestDto;
 import com.antonigari.iotdeviceservice.model.DeviceMeasurementsDto;
@@ -49,6 +50,14 @@ public class DeviceMeasurementController {
             @PathVariable @NotEmpty final String topic
     ) {
         return new ResponseEntity<>(this.deviceMeasurementManagerService.getAsyncByTopic(topic).join(), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/{id}/details")
+    @Operation(summary = "Get DeviceMeasurement details", description = "Get DeviceMeasurement details by id.")
+    public ResponseEntity<DeviceMeasurementDetailsDto> getDeviceMeasurementDetailsById(
+            @PathVariable @Positive final long id
+    ) {
+        return new ResponseEntity<>(this.deviceMeasurementManagerService.getDetailsAsyncById(id).join(), HttpStatus.OK);
     }
 
     @PutMapping("/{id}")

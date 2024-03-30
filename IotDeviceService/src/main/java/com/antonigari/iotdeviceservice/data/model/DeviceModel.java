@@ -32,11 +32,6 @@ public class DeviceModel {
     private String serialNumber;
 
     private String name;
-/*
-    @ManyToOne
-    @JoinColumn(name = "deviceFunctionalityId")
-    private DeviceFunctionality deviceFunctionality;
- */
 
     @ManyToOne
     @JoinColumn(name = "companyId")

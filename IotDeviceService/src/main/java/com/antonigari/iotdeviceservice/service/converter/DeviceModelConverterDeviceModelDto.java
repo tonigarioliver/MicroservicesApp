@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 public class DeviceModelConverterDeviceModelDto implements Converter<DeviceModel, DeviceModelDto> {
     @Override
     @NonNull
-    public DeviceModelDto convert(DeviceModel deviceModel) {
-        return  DeviceModelDto.builder()
+    public DeviceModelDto convert(final DeviceModel deviceModel) {
+        return DeviceModelDto.builder()
                 .deviceModelId(deviceModel.getDeviceModelId())
                 .name(deviceModel.getName())
                 .serialNumber(deviceModel.getSerialNumber())

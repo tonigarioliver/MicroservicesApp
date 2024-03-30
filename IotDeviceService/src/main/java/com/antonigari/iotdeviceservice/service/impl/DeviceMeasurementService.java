@@ -3,6 +3,7 @@ package com.antonigari.iotdeviceservice.service.impl;
 import com.antonigari.iotdeviceservice.data.model.Device;
 import com.antonigari.iotdeviceservice.data.model.DeviceMeasurement;
 import com.antonigari.iotdeviceservice.data.repository.DeviceMeasurementRepository;
+import com.antonigari.iotdeviceservice.model.DeviceMeasurementDetailsDto;
 import com.antonigari.iotdeviceservice.model.DeviceMeasurementDto;
 import com.antonigari.iotdeviceservice.model.DeviceMeasurementRequestDto;
 import com.antonigari.iotdeviceservice.model.DeviceMeasurementsDto;
@@ -53,6 +54,16 @@ public class DeviceMeasurementService implements IDeviceMeasurementService {
         return CompletableFuture.supplyAsync(() ->
                 this.repository.findById(id)
                         .map(measurement -> this.conversionService.convert(measurement, DeviceMeasurementDto.class))
+                        .orElseThrow(() -> ServiceErrorCatalog
+                                .NOT_FOUND.exception("DeviceMeasurement with ID " + id + " not found"))
+        );
+    }
+
+    @Override
+    public CompletableFuture<DeviceMeasurementDetailsDto> getDetailsAsyncById(final long id) {
+        return CompletableFuture.supplyAsync(() ->
+                this.repository.findById(id)
+                        .map(measurement -> this.conversionService.convert(measurement, DeviceMeasurementDetailsDto.class))
                         .orElseThrow(() -> ServiceErrorCatalog
                                 .NOT_FOUND.exception("DeviceMeasurement with ID " + id + " not found"))
         );

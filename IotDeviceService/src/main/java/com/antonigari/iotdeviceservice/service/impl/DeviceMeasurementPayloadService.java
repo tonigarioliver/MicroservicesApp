@@ -7,7 +7,7 @@ import com.antonigari.iotdeviceservice.data.repository.DeviceMeasurementReposito
 import com.antonigari.iotdeviceservice.model.DeviceMeasurementPayloadDto;
 import com.antonigari.iotdeviceservice.model.DeviceMeasurementPayloadRequestDto;
 import com.antonigari.iotdeviceservice.model.DeviceMeasurementPayloadsDto;
-import com.antonigari.iotdeviceservice.service.IDeviceMeasurementPayload;
+import com.antonigari.iotdeviceservice.service.IDeviceMeasurementPayloadService;
 import com.antonigari.iotdeviceservice.service.exception.ServiceErrorCatalog;
 import lombok.AllArgsConstructor;
 import org.springframework.core.convert.ConversionService;
@@ -17,7 +17,7 @@ import java.util.concurrent.CompletableFuture;
 
 @Service
 @AllArgsConstructor
-public class DeviceMeasurementPayloadService implements IDeviceMeasurementPayload {
+public class DeviceMeasurementPayloadService implements IDeviceMeasurementPayloadService {
     private final DeviceMeasurementPayloadRepository repository;
     private final ConversionService conversionService;
     private final DeviceMeasurementRepository measurementRepository;
@@ -49,7 +49,6 @@ public class DeviceMeasurementPayloadService implements IDeviceMeasurementPayloa
         throw new UnsupportedOperationException("update method is not implemented yet");
     }
 
-
     @Override
     public void delete(final long id) {
         final DeviceMeasurementPayload payload = this.repository.findById(id)
@@ -57,7 +56,5 @@ public class DeviceMeasurementPayloadService implements IDeviceMeasurementPayloa
                         .NOT_FOUND.exception("Payload with ID " + id + " not found"));
 
         this.repository.delete(payload);
-
-
     }
 }

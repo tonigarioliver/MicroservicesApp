@@ -8,7 +8,7 @@ import lombok.Value;
 @Builder
 @Value
 public class DeviceMeasurementPayloadDto {
-    Long deviceMeasurementId;
+    Long deviceMeasurementPayloadId;
     String stringValue;
     Float numValue;
     Boolean booleanValue;

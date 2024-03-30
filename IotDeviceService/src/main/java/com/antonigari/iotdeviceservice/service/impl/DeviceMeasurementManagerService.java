@@ -1,6 +1,7 @@
 package com.antonigari.iotdeviceservice.service.impl;
 
 import com.antonigari.iotdeviceservice.data.model.KafkaProducerTopic;
+import com.antonigari.iotdeviceservice.model.DeviceMeasurementDetailsDto;
 import com.antonigari.iotdeviceservice.model.DeviceMeasurementDto;
 import com.antonigari.iotdeviceservice.model.DeviceMeasurementRequestDto;
 import com.antonigari.iotdeviceservice.model.DeviceMeasurementsDto;
@@ -31,6 +32,10 @@ public class DeviceMeasurementManagerService implements ICrudService<
 
     public CompletableFuture<DeviceMeasurementDto> getAsyncByTopic(final String topic) {
         return this.deviceMeasurementService.getAsyncByTopic(topic);
+    }
+
+    public CompletableFuture<DeviceMeasurementDetailsDto> getDetailsAsyncById(final long id) {
+        return this.deviceMeasurementService.getDetailsAsyncById(id);
     }
 
     @Override
