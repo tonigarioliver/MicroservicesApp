@@ -7,7 +7,7 @@ spring:
   kafka:
     bootstrap-servers: localhost:29092
     consumer:
-      group-id: iot-info-service
+      group-id: iot-mqtt-client-service
       topics: "new-device,delete-device,update-device"
 grpc:
   server:
