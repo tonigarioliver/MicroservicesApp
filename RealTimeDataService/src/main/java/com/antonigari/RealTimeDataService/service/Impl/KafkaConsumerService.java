@@ -1,7 +1,8 @@
 package com.antonigari.RealTimeDataService.service.Impl;
 
-import com.example.mqttclient.data.model.DeviceMeasurementDto;
-import com.example.mqttclient.service.IKafkaConsumerService;
+
+import com.antonigari.RealTimeDataService.model.DeviceMeasurementDto;
+import com.antonigari.RealTimeDataService.service.IKafkaConsumerService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;

@@ -1,6 +1,6 @@
 package com.antonigari.RealTimeDataService.config.grpc;
 
-import com.antonigari.MqttClient.DeviceMeasurementGrpcServiceGrpc;
+import com.antonigari.RealTimeDataService.DeviceMeasurementGrpcServiceGrpc;
 import io.grpc.ManagedChannelBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

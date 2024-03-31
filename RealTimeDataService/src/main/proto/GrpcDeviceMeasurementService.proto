@@ -4,7 +4,7 @@ package DeviceMeasurementService;
 
 
 option java_multiple_files = true;
-option java_package = "com.antonigari.MqttClient";
+option java_package = "com.antonigari.RealTimeDataService";
 service DeviceMeasurementGrpcService {
   rpc GetAllDeviceMeasurement(GetAllDeviceMeasurementRequest) returns (GetAllDeviceMeasurementResponse);
 }

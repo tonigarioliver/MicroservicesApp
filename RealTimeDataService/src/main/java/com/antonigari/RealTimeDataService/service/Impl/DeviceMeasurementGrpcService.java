@@ -1,13 +1,13 @@
 package com.antonigari.RealTimeDataService.service.Impl;
 
-import com.antonigari.MqttClient.DeviceMeasurementGrpcServiceGrpc;
-import com.antonigari.MqttClient.GetAllDeviceMeasurementRequest;
-import com.antonigari.MqttClient.GetAllDeviceMeasurementResponse;
-import com.antonigari.MqttClient.MeasurementTypeNameGrpc;
-import com.example.mqttclient.data.model.DeviceDto;
-import com.example.mqttclient.data.model.DeviceMeasurementDto;
-import com.example.mqttclient.data.model.MeasurementTypeDto;
-import com.example.mqttclient.data.model.MeasurementTypeName;
+import com.antonigari.RealTimeDataService.DeviceMeasurementGrpcServiceGrpc;
+import com.antonigari.RealTimeDataService.GetAllDeviceMeasurementRequest;
+import com.antonigari.RealTimeDataService.GetAllDeviceMeasurementResponse;
+import com.antonigari.RealTimeDataService.MeasurementTypeNameGrpc;
+import com.antonigari.RealTimeDataService.model.DeviceDto;
+import com.antonigari.RealTimeDataService.model.DeviceMeasurementDto;
+import com.antonigari.RealTimeDataService.model.MeasurementTypeDto;
+import com.antonigari.RealTimeDataService.model.MeasurementTypeName;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
