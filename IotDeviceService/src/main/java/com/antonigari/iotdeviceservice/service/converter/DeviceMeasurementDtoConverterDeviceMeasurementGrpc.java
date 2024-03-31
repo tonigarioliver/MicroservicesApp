@@ -21,8 +21,8 @@ public class DeviceMeasurementDtoConverterDeviceMeasurementGrpc implements Conve
                         .setManufactureCode(measure.device().getManufactureCode())
                         .build())
                 .setMeasurementType(MeasurementTypeGrpc.newBuilder()
-                        .setMeasurementTypeId(measure.measurementType().getMeasurementTypeId())
-                        .setTypeName(this.getGrpcMeasurementTypeName(measure.measurementType().getTypeName()))
+                        .setMeasurementTypeId(measure.measurementType().measurementTypeId())
+                        .setTypeName(this.getGrpcMeasurementTypeName(measure.measurementType().typeName()))
                         .build())
                 .build();
     }
@@ -39,7 +39,7 @@ public class DeviceMeasurementDtoConverterDeviceMeasurementGrpc implements Conve
                 return MeasurementTypeNameGrpc.NUMERIC;
             }
         }
-        throw new UnsupportedOperationException("update method is not implemented yet");
+        throw new UnsupportedOperationException("type name is not implemented yet");
     }
 
 }

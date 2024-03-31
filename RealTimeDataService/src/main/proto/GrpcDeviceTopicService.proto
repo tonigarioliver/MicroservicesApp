@@ -1,24 +1,35 @@
 syntax = "proto3";
-
 package DevicesTopicService;
-
-
 option java_multiple_files = true;
 option java_package = "com.antonigari.RealTimeDataService";
-service GrpcDeviceTopicService {
-  rpc GetAllDeviceTopic(GetAllDeviceTopicRequest) returns (GetAllDeviceTopicResponse);
+
+service DeviceMeasurementGrpcService {
+  rpc GetAllDeviceMeasurement(GetAllDeviceMeasurementRequest) returns (GetAllDeviceMeasurementResponse);
 }
 
-message GetAllDeviceTopicRequest {
+message GetAllDeviceMeasurementRequest {
   // Define request fields if needed
 }
 
-message DeviceTopicGrpc {
-  int64 id = 1;
+message DeviceMeasurementGrpc {
+  int64 deviceMeasurementId = 1;
   string topic = 2;
-  string manufactureCode = 3;
+  DeviceGrpc device = 3;
+  MeasurementTypeGrpc measurementType = 4;
 }
-
-message GetAllDeviceTopicResponse {
-  repeated DeviceTopicGrpc deviceTopics = 1;
+message DeviceGrpc{
+  int64 deviceId = 1;
+  string manufactureCode = 2;
+}
+message MeasurementTypeGrpc{
+  int64 measurementTypeId = 1;
+  MeasurementTypeNameGrpc typeName = 2;
+}
+enum MeasurementTypeNameGrpc {
+  STRING = 0;
+  NUMERIC = 1;
+  BOOLEAN = 2;
+}
+message GetAllDeviceMeasurementResponse {
+  repeated DeviceMeasurementGrpc deviceMeasurement = 1;
 }
