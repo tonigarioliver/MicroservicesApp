@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.mqttv5.common.MqttException;
 import org.eclipse.paho.mqttv5.common.MqttMessage;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -21,17 +22,17 @@ import java.util.concurrent.CompletableFuture;
 @Service
 @Slf4j
 @AllArgsConstructor
+@EnableScheduling
 public class MqttClientService {
 
     private final MqttClientConfig mqttClientConfig;
     private final MqttCustomClient mqttCustomClient;
-    private final DeviceTopicService deviceTopicService;
+    private final DeviceMeasurementGrpcService measurementGrpcService;
     private final PayloadGenerator payloadGenerator;
     private final Set<DeviceMeasurementDto> mqttTopics = new HashSet<>();
 
     @PostConstruct
     public void initialize() {
-        this.mqttTopics.addAll(this.deviceTopicService.getAllDeviceMeasurement());
         try {
             final CompletableFuture<Void> connectionFuture = this.mqttConnectAsync();
             connectionFuture.thenAccept(result -> {
@@ -52,7 +53,8 @@ public class MqttClientService {
             final MqttMessageHandler listener = new MqttMessageHandler(this.mqttCustomClient);
             this.mqttCustomClient.getMqttClient().setCallback(listener);
             this.mqttTopics.clear();
-            this.deviceTopicService.getAllDeviceMeasurement().forEach(this::addSubscription);
+            this.measurementGrpcService.getAllDeviceMeasurement().forEach(this::addSubscription);
+            this.mqttCustomClient.setConnected(true);
         } catch (final MqttException e) {
             log.error("Error en la conexión MQTT: " + e.getMessage(), e);
             future.completeExceptionally(e);
@@ -96,7 +98,7 @@ public class MqttClientService {
         this.addSubscription(measure);
     }
 
-    @Scheduled(fixedRate = 10000)
+    @Scheduled(fixedRate = 1000)
     private void sendRandomMessages() {
         if (this.mqttCustomClient.isConnected()) {
             this.mqttTopics.forEach(topic -> {

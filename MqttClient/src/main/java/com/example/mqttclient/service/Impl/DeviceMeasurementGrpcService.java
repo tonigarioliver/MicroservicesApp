@@ -9,18 +9,21 @@ import com.example.mqttclient.data.model.DeviceMeasurementDto;
 import com.example.mqttclient.data.model.MeasurementTypeDto;
 import com.example.mqttclient.data.model.MeasurementTypeName;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class DeviceTopicService {
+@Slf4j
+public class DeviceMeasurementGrpcService {
     private final DeviceMeasurementGrpcServiceGrpc.DeviceMeasurementGrpcServiceBlockingStub deviceMeasurementGrpcServiceBlockingStub;
 
     public List<DeviceMeasurementDto> getAllDeviceMeasurement() {
         final GetAllDeviceMeasurementResponse response = this.deviceMeasurementGrpcServiceBlockingStub
                 .getAllDeviceMeasurement(GetAllDeviceMeasurementRequest.newBuilder().build());
+        log.info(response.toString());
         return response.getDeviceMeasurementList().stream()
                 .map(meassure -> DeviceMeasurementDto.builder()
                         .deviceMeasurementId(meassure.getDeviceMeasurementId())

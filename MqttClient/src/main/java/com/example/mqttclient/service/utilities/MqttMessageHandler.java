@@ -21,7 +21,6 @@ public class MqttMessageHandler implements org.eclipse.paho.mqttv5.client.MqttCa
 
     @Override
     public void disconnected(final MqttDisconnectResponse mqttDisconnectResponse) {
-        this.mqttCustomClient.setConnected(false);
     }
 
     @Override
@@ -41,7 +40,6 @@ public class MqttMessageHandler implements org.eclipse.paho.mqttv5.client.MqttCa
 
     @Override
     public void connectComplete(final boolean b, final String s) {
-        this.mqttCustomClient.setConnected(true);
     }
 
     @Override
