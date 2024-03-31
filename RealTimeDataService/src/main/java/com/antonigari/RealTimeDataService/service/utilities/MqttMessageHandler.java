@@ -1,6 +1,6 @@
 package com.antonigari.RealTimeDataService.service.utilities;
 
-import com.antonigari.RealTimeDataService.config.mqtt.MqttCustomClient;
+import com.example.mqttclient.config.mqtt.MqttCustomClient;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.mqttv5.client.IMqttToken;
 import org.eclipse.paho.mqttv5.client.MqttDisconnectResponse;

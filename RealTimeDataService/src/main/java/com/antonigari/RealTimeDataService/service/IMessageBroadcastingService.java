@@ -1,7 +1,5 @@
 package com.antonigari.RealTimeDataService.service;
 
-public interface IMessageBroadcastingService<SendMessage, ReceiveMessage, HeaderReceiveMessage> {
-    public void listen(final ReceiveMessage payload, final HeaderReceiveMessage header);
-
-    boolean sendMessage(final SendMessage payload);
+public interface IMessageBroadcastingService<T, H> {
+    public void listen(final T payload, final H header);
 }

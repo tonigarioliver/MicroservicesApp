@@ -1,12 +1,9 @@
 package com.antonigari.RealTimeDataService.service.Impl;
 
-
 import com.antonigari.RealTimeDataService.config.mqtt.MqttClientConfig;
 import com.antonigari.RealTimeDataService.config.mqtt.MqttCustomClient;
-import com.antonigari.RealTimeDataService.model.MqttTopic;
+import com.antonigari.RealTimeDataService.model.DeviceMeasurementDto;
 import com.antonigari.RealTimeDataService.service.utilities.MqttMessageHandler;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,12 +21,11 @@ public class MqttClientService {
 
     private final MqttClientConfig mqttClientConfig;
     private final MqttCustomClient mqttCustomClient;
-    private final DeviceTopicService deviceTopicService;
-    private final Set<MqttTopic> mqttTopics = new HashSet<>();
+    private final DeviceMeasurementGrpcService measurementGrpcService;
+    private final Set<DeviceMeasurementDto> mqttTopics = new HashSet<>();
 
     @PostConstruct
     public void initialize() {
-        this.mqttTopics.addAll(this.deviceTopicService.getDeviceTopics());
         try {
             final CompletableFuture<Void> connectionFuture = this.mqttConnectAsync();
             connectionFuture.thenAccept(result -> {
@@ -50,7 +46,8 @@ public class MqttClientService {
             final MqttMessageHandler listener = new MqttMessageHandler(this.mqttCustomClient);
             this.mqttCustomClient.getMqttClient().setCallback(listener);
             this.mqttTopics.clear();
-            this.deviceTopicService.getDeviceTopics().forEach(this::addSubscription);
+            this.measurementGrpcService.getAllDeviceMeasurement().forEach(this::addSubscription);
+            this.mqttCustomClient.setConnected(true);
         } catch (final MqttException e) {
             log.error("Error en la conexión MQTT: " + e.getMessage(), e);
             future.completeExceptionally(e);
@@ -58,60 +55,54 @@ public class MqttClientService {
         return future;
     }
 
-    public synchronized void addSubscription(final MqttTopic topic) {
-        if (this.mqttTopics.contains(topic)) {
-            log.info("Topic already exists: " + topic);
+    public synchronized void addSubscription(final DeviceMeasurementDto measure) {
+        if (this.mqttTopics.contains(measure)) {
+            log.warn("Topic already exists: " + measure);
             return;
         }
-        log.info("New topic added: " + topic);
-        this.mqttTopics.add(topic);
-        this.subscribeTopic(topic);
+        log.info("New topic added: " + measure);
+        this.mqttTopics.add(measure);
+        this.subscribeTopic(measure);
     }
 
-    public synchronized void removeSubscription(final MqttTopic topic) {
-        if (!this.mqttTopics.contains(topic)) {
-            log.info("Topic does not exist: " + topic);
+    public synchronized void removeSubscription(final DeviceMeasurementDto measure) {
+        if (!this.mqttTopics.contains(measure)) {
+            log.warn("Topic does not exist: " + measure);
             return;
         }
-        log.info("Topic to remove: " + topic);
-        this.mqttTopics.remove(topic);
-        this.unsubscribeTopic(topic);
+        log.info("Topic to remove: " + measure);
+        this.mqttTopics.remove(measure);
+        this.unsubscribeTopic(measure);
     }
 
-    public synchronized void updateSubscription(final MqttTopic updatedTopic) {
+    public synchronized void updateSubscription(final DeviceMeasurementDto measure) {
         // Search for the topic with the same serialNumber
-        final MqttTopic existingTopic = this.mqttTopics.stream()
-                .filter(topic -> topic.getManufactureCode().equals(updatedTopic.getManufactureCode()))
+        final DeviceMeasurementDto existingMeasure = this.mqttTopics.stream()
+                .filter(topic -> topic.deviceMeasurementId().equals(measure.deviceMeasurementId()))
                 .findFirst()
                 .orElse(null);
 
-        if (existingTopic == null) {
-            log.info("Topic not found for update: " + updatedTopic);
+        if (existingMeasure == null) {
+            log.warn("Topic not found for update: " + measure);
             return;
         }
-        log.info("Topic updated: " + updatedTopic);
-        this.unsubscribeTopic(existingTopic);
-        this.addSubscription(updatedTopic);
+        log.info("Topic updated: " + measure);
+        this.unsubscribeTopic(existingMeasure);
+        this.addSubscription(measure);
     }
 
-    private void unsubscribeTopic(final MqttTopic topic) {
+    private void unsubscribeTopic(final DeviceMeasurementDto measure) {
         try {
-            final ObjectMapper objectMapper = new ObjectMapper();
-            this.mqttCustomClient.getMqttClient().unsubscribe(objectMapper.writeValueAsString(topic));
+            this.mqttCustomClient.getMqttClient().unsubscribe(measure.topic());
         } catch (final MqttException e) {
-            log.error(e.getMessage());
-        } catch (final JsonProcessingException e) {
             log.error(e.getMessage());
         }
     }
 
-    private void subscribeTopic(final MqttTopic topic) {
+    private void subscribeTopic(final DeviceMeasurementDto measure) {
         try {
-            final ObjectMapper objectMapper = new ObjectMapper();
-            this.mqttCustomClient.getMqttClient().subscribe(objectMapper.writeValueAsString(topic), 1);
+            this.mqttCustomClient.getMqttClient().subscribe(measure.topic(), 1);
         } catch (final MqttException e) {
-            log.error(e.getMessage());
-        } catch (final JsonProcessingException e) {
             log.error(e.getMessage());
         }
     }

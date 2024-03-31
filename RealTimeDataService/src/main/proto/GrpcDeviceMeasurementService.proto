@@ -1,8 +1,10 @@
 syntax = "proto3";
-package DevicesTopicService;
-option java_multiple_files = true;
-option java_package = "com.antonigari.RealTimeDataService";
 
+package DeviceMeasurementService;
+
+
+option java_multiple_files = true;
+option java_package = "com.antonigari.MqttClient";
 service DeviceMeasurementGrpcService {
   rpc GetAllDeviceMeasurement(GetAllDeviceMeasurementRequest) returns (GetAllDeviceMeasurementResponse);
 }

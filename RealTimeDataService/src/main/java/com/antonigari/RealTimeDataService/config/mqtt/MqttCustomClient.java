@@ -1,6 +1,7 @@
 package com.antonigari.RealTimeDataService.config.mqtt;
 
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.mqttv5.client.MqttClient;
 import org.eclipse.paho.mqttv5.client.persist.MemoryPersistence;
@@ -12,8 +13,10 @@ import java.util.UUID;
 @Configuration
 @Slf4j
 @Getter
+@Setter
 public class MqttCustomClient {
-    final MqttClient mqttClient;
+    private final MqttClient mqttClient;
+    private boolean connected = false;
 
     public MqttCustomClient(final MqttClientConfig mqttClientConfig) {
         final String clientId = UUID.randomUUID().toString();
