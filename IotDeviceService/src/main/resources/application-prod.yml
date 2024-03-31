@@ -11,7 +11,7 @@ spring:
       ddl-auto: update
     show-sql: true
   kafka:
-    bootstrap-servers: localhost:29092
+    bootstrap-servers: kafka:9092
     consumer:
       group-id: iot-info-service
       topics: "new-measure-payload,update-measure-payload,delete-measure-payload,"
