@@ -26,4 +26,5 @@ public class DeviceMeasurementPayload {
     private String stringValue;
     private Float numValue;
     private Boolean booleanValue;
+    
 }
