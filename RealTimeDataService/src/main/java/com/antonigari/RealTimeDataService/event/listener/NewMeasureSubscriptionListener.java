@@ -13,6 +13,6 @@ public class NewMeasureSubscriptionListener implements ApplicationListener<NewMe
 
     @Override
     public void onApplicationEvent(final NewMeasureSubscriptionEvent event) {
-        this.mqttClientService.addWebSocketClient(event.getSession(), event.getMeasurement());
+        this.mqttClientService.addWebSocketClient(event.getSession(), event.getTopic());
     }
 }

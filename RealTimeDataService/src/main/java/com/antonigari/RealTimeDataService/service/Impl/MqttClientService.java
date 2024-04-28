@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
@@ -78,7 +79,7 @@ public class MqttClientService {
         log.info("Topic to remove: " + measure);
         this.measurements.remove(measure);
         this.unsubscribeTopic(measure);
-        this.webSocketClientManager.removeWebSocketClientsWhenTopicRemoved(measure);
+        this.webSocketClientManager.removeWebSocketClientsWhenTopicRemoved(measure.topic());
     }
 
     public synchronized void updateSubscription(final DeviceMeasurementDto measure) {
@@ -95,13 +96,13 @@ public class MqttClientService {
         log.info("Topic updated: " + measure);
         this.unsubscribeTopic(existingMeasure);
         this.addSubscription(measure);
-        this.webSocketClientManager.updateWebSocketClientWhenTopicUpdate(existingMeasure, measure);
+        this.webSocketClientManager.updateWebSocketClientWhenTopicUpdate(existingMeasure.topic(), measure.topic());
     }
 
     private void unsubscribeTopic(final DeviceMeasurementDto measure) {
         try {
             this.mqttCustomClient.getMqttClient().unsubscribe(measure.topic());
-            this.webSocketClientManager.removeWebSocketClientsWhenTopicRemoved(measure);
+            this.webSocketClientManager.removeWebSocketClientsWhenTopicRemoved(measure.topic());
         } catch (final MqttException e) {
             log.error(e.getMessage());
         }
@@ -115,18 +116,18 @@ public class MqttClientService {
         }
     }
 
-    public void addWebSocketClient(final WebSocketSession session, final DeviceMeasurementDto measurementDto) {
-        this.webSocketClientManager.subscribe(session, measurementDto);
-        this.addSubscription(measurementDto);
+    public void addWebSocketClient(final WebSocketSession session, final String topic) {
+        this.webSocketClientManager.subscribe(session, topic);
     }
 
-    public void removeWebSocketClientTopic(final WebSocketSession session, final DeviceMeasurementDto measurementDto) {
-        this.webSocketClientManager.removeWebSocketClientTopic(session, measurementDto);
-        this.webSocketClientManager.getKeysWithEmptyLists().forEach(this::removeSubscription);
-    }
+    public void removeWebSocketClientTopic(final WebSocketSession session, final String topic) {
+        this.webSocketClientManager.removeWebSocketClientTopic(session, topic);
 
-    public void removeWebSocketClient(final WebSocketSession session) {
-        this.webSocketClientManager.removeWebSocketClient(session);
-        this.webSocketClientManager.getKeysWithEmptyLists().forEach(this::removeSubscription);
+        this.webSocketClientManager.getKeysWithEmptyLists().stream()
+                .map(t -> this.measurements.stream().filter(measurementDto -> measurementDto.topic().equals(t)).findFirst())
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .forEach(this::removeSubscription);
+
     }
 }

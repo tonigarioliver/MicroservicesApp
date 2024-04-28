@@ -13,6 +13,6 @@ public class RemoveMeasureSubscriptionListener implements ApplicationListener<Re
 
     @Override
     public void onApplicationEvent(final RemoveMeasureSubscriptionEvent event) {
-        this.mqttClientService.removeWebSocketClientTopic(event.getSession(), event.getMeasurement());
+        this.mqttClientService.removeWebSocketClientTopic(event.getSession(), event.getTopic());
     }
 }

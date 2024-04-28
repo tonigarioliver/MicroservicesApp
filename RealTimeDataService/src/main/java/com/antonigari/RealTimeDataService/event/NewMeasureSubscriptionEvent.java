@@ -1,18 +1,17 @@
 package com.antonigari.RealTimeDataService.event;
 
-import com.antonigari.RealTimeDataService.model.DeviceMeasurementDto;
 import lombok.Value;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.web.socket.WebSocketSession;
 
 @Value
 public class NewMeasureSubscriptionEvent extends ApplicationEvent {
-    private DeviceMeasurementDto measurement;
-    private WebSocketSession session;
+    String topic;
+    WebSocketSession session;
 
-    public NewMeasureSubscriptionEvent(final Object source, final DeviceMeasurementDto measurementDto, final WebSocketSession session) {
+    public NewMeasureSubscriptionEvent(final Object source, final String topic, final WebSocketSession session) {
         super(source);
-        this.measurement = measurementDto;
+        this.topic = topic;
         this.session = session;
     }
 }
