@@ -3,11 +3,14 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
+import { catchError, retry, throwError } from 'rxjs';
 import { DeviceMeasurementFormComponent } from 'src/app/core/components/device-measurement-form/device-measurement-form.component';
 import { DeviceMeasurement } from 'src/app/core/models/device-measurement';
 import { DeviceMeasurementRequest } from 'src/app/core/models/device-measurement-request';
+import { RealTimeWebSocketRequest } from 'src/app/core/models/real-time-iot-message';
 import { DeviceMeasurementApiService } from 'src/app/core/services/api/device-measurement-api.service';
 import { ToastService } from 'src/app/core/services/toast.service';
+import { RealTimeIotService } from 'src/app/core/services/websocket/real-time-iot.service';
 
 @Component({
   selector: 'app-device-measurement',
@@ -15,7 +18,7 @@ import { ToastService } from 'src/app/core/services/toast.service';
   styleUrls: ['./device-measurement.component.css']
 })
 export class DeviceMeasurementComponent implements OnInit {
-
+  public interval: number = 1;
   displayedColumns: string[] = ['measurementName', 'measurementUnit', 'measurementTopic', 'measurementType', 'measurementDevice', 'actions'];
   tableData = new MatTableDataSource<DeviceMeasurement>();
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -24,8 +27,11 @@ export class DeviceMeasurementComponent implements OnInit {
   constructor(
     private deviceMeasurementApiService: DeviceMeasurementApiService,
     private deviceDialog: MatDialog,
-    private toastService: ToastService
-  ) { }
+    private toastService: ToastService,
+    private realTimeService: RealTimeIotService,
+  ) {
+    this.connectRealTimeMeasure();
+  }
 
   ngOnInit(): void {
     this.tableData.paginator = this.paginator;
@@ -33,11 +39,35 @@ export class DeviceMeasurementComponent implements OnInit {
     this.fetchDeviceMeasurements();
   }
 
+  connectRealTimeMeasure(): void {
+    this.realTimeService.webSocket$
+      .pipe(
+        catchError((error) => {
+          this.interval = 1;
+          this.toastService.showError(error);
+          return throwError(() => error);
+        }),
+        retry({ delay: 5_000 }),
+      )
+      .subscribe((value: any) => {
+        console.log(value);
+      });
+  }
+
+  addRealTimeMeasure(deviceMeasurement: DeviceMeasurement) {
+    const req: RealTimeWebSocketRequest = {
+      command: "SUBSCRIBE",
+      deviceMeasurement: deviceMeasurement
+    }
+    this.realTimeService.sendIOTRequest(req);
+  }
+
   fetchDeviceMeasurements(): void {
     this.deviceMeasurementApiService.getDeviceMeasurements().subscribe(
       (deviceMeasurements: DeviceMeasurement[]) => {
         console.debug(deviceMeasurements)
         this.tableData.data = deviceMeasurements;
+        this.addRealTimeMeasure(deviceMeasurements[0])
       },
       (error) => {
         this.toastService.showError(error.message)
@@ -95,4 +125,5 @@ export class DeviceMeasurementComponent implements OnInit {
       );
   }
 }
+
 
