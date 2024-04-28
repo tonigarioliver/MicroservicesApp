@@ -7,16 +7,22 @@ import org.eclipse.paho.mqttv5.client.MqttDisconnectResponse;
 import org.eclipse.paho.mqttv5.common.MqttException;
 import org.eclipse.paho.mqttv5.common.MqttMessage;
 import org.eclipse.paho.mqttv5.common.packet.MqttProperties;
+import org.springframework.stereotype.Component;
+import org.springframework.web.socket.TextMessage;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 
 @Slf4j
+@Component
 public class MqttMessageHandler implements org.eclipse.paho.mqttv5.client.MqttCallback {
     private final MqttCustomClient mqttCustomClient;
+    private final WebSocketClientManager webSocketClientManager;
 
-    public MqttMessageHandler(final MqttCustomClient mqttCustomClient) {
+    public MqttMessageHandler(final MqttCustomClient mqttCustomClient, final WebSocketClientManager webSocketClientManager) {
         this.mqttCustomClient = mqttCustomClient;
+        this.webSocketClientManager = webSocketClientManager;
     }
 
     @Override
@@ -31,11 +37,26 @@ public class MqttMessageHandler implements org.eclipse.paho.mqttv5.client.MqttCa
     public void messageArrived(final String topic, final MqttMessage message) throws Exception {
         final String messagePayload = new String(message.getPayload(), StandardCharsets.UTF_8);
         log.info("Received message on topic '{}': {}", topic, messagePayload);
+        this.sendToSubscribers(topic, messagePayload);
+    }
+
+    private void sendToSubscribers(final String topic, final String messagePayload) {
+        this.webSocketClientManager.getAllSessionsByTopic(topic)
+                .forEach(webSocketSession -> {
+                            try {
+                                webSocketSession
+                                        .sendMessage(new TextMessage("Received " + messagePayload + " !")
+                                        );
+                            } catch (final IOException e) {
+                                log.error(String.format("Error Websocket with reason %s", e.getMessage()));
+                            }
+                        }
+                );
+
     }
 
     @Override
     public void deliveryComplete(final IMqttToken iMqttToken) {
-
     }
 
     @Override

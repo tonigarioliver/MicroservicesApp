@@ -4,11 +4,13 @@ import com.antonigari.RealTimeDataService.config.mqtt.MqttClientConfig;
 import com.antonigari.RealTimeDataService.config.mqtt.MqttCustomClient;
 import com.antonigari.RealTimeDataService.model.DeviceMeasurementDto;
 import com.antonigari.RealTimeDataService.service.utilities.MqttMessageHandler;
+import com.antonigari.RealTimeDataService.service.utilities.WebSocketClientManager;
 import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.mqttv5.common.MqttException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.socket.WebSocketSession;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -22,7 +24,10 @@ public class MqttClientService {
     private final MqttClientConfig mqttClientConfig;
     private final MqttCustomClient mqttCustomClient;
     private final DeviceMeasurementGrpcService measurementGrpcService;
-    private final Set<DeviceMeasurementDto> mqttTopics = new HashSet<>();
+    private final Set<DeviceMeasurementDto> measurements = new HashSet<>();
+    private MqttMessageHandler listener;
+    private final WebSocketClientManager webSocketClientManager;
+
 
     @PostConstruct
     public void initialize() {
@@ -43,9 +48,9 @@ public class MqttClientService {
         try {
             this.mqttCustomClient.getMqttClient().connect(this.mqttClientConfig.mqttConnectionOptions());
             future.complete(null);
-            final MqttMessageHandler listener = new MqttMessageHandler(this.mqttCustomClient);
-            this.mqttCustomClient.getMqttClient().setCallback(listener);
-            this.mqttTopics.clear();
+            this.listener = new MqttMessageHandler(this.mqttCustomClient, this.webSocketClientManager);
+            this.mqttCustomClient.getMqttClient().setCallback(this.listener);
+            this.measurements.clear();
             this.measurementGrpcService.getAllDeviceMeasurement().forEach(this::addSubscription);
             this.mqttCustomClient.setConnected(true);
         } catch (final MqttException e) {
@@ -56,28 +61,29 @@ public class MqttClientService {
     }
 
     public synchronized void addSubscription(final DeviceMeasurementDto measure) {
-        if (this.mqttTopics.contains(measure)) {
+        if (this.measurements.contains(measure)) {
             log.warn("Topic already exists: " + measure);
             return;
         }
         log.info("New topic added: " + measure);
-        this.mqttTopics.add(measure);
+        this.measurements.add(measure);
         this.subscribeTopic(measure);
     }
 
     public synchronized void removeSubscription(final DeviceMeasurementDto measure) {
-        if (!this.mqttTopics.contains(measure)) {
+        if (!this.measurements.contains(measure)) {
             log.warn("Topic does not exist: " + measure);
             return;
         }
         log.info("Topic to remove: " + measure);
-        this.mqttTopics.remove(measure);
+        this.measurements.remove(measure);
         this.unsubscribeTopic(measure);
+        this.webSocketClientManager.removeWebSocketClientsWhenTopicRemoved(measure);
     }
 
     public synchronized void updateSubscription(final DeviceMeasurementDto measure) {
         // Search for the topic with the same serialNumber
-        final DeviceMeasurementDto existingMeasure = this.mqttTopics.stream()
+        final DeviceMeasurementDto existingMeasure = this.measurements.stream()
                 .filter(topic -> topic.deviceMeasurementId().equals(measure.deviceMeasurementId()))
                 .findFirst()
                 .orElse(null);
@@ -89,11 +95,13 @@ public class MqttClientService {
         log.info("Topic updated: " + measure);
         this.unsubscribeTopic(existingMeasure);
         this.addSubscription(measure);
+        this.webSocketClientManager.updateWebSocketClientWhenTopicUpdate(existingMeasure, measure);
     }
 
     private void unsubscribeTopic(final DeviceMeasurementDto measure) {
         try {
             this.mqttCustomClient.getMqttClient().unsubscribe(measure.topic());
+            this.webSocketClientManager.removeWebSocketClientsWhenTopicRemoved(measure);
         } catch (final MqttException e) {
             log.error(e.getMessage());
         }
@@ -105,5 +113,20 @@ public class MqttClientService {
         } catch (final MqttException e) {
             log.error(e.getMessage());
         }
+    }
+
+    public void addWebSocketClient(final WebSocketSession session, final DeviceMeasurementDto measurementDto) {
+        this.webSocketClientManager.subscribe(session, measurementDto);
+        this.addSubscription(measurementDto);
+    }
+
+    public void removeWebSocketClientTopic(final WebSocketSession session, final DeviceMeasurementDto measurementDto) {
+        this.webSocketClientManager.removeWebSocketClientTopic(session, measurementDto);
+        this.webSocketClientManager.getKeysWithEmptyLists().forEach(this::removeSubscription);
+    }
+
+    public void removeWebSocketClient(final WebSocketSession session) {
+        this.webSocketClientManager.removeWebSocketClient(session);
+        this.webSocketClientManager.getKeysWithEmptyLists().forEach(this::removeSubscription);
     }
 }
