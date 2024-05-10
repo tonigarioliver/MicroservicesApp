@@ -1,9 +1,4 @@
 spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5435/microservices
-    username: admin
-    password: postgres
-    driver-class-name: org.postgresql.Driver
   kafka:
     bootstrap-servers: localhost:29092
     consumer:

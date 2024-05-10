@@ -29,7 +29,7 @@ public class MqttClientService {
     private final MqttCustomClient mqttCustomClient;
     private final DeviceMeasurementGrpcService measurementGrpcService;
     private final PayloadGenerator payloadGenerator;
-    private final Set<DeviceMeasurementDto> mqttTopics = new HashSet<>();
+    private final Set<DeviceMeasurementDto> deviceMeasurementList = new HashSet<>();
 
     @PostConstruct
     public void initialize() {
@@ -52,7 +52,7 @@ public class MqttClientService {
             future.complete(null);
             final MqttMessageHandler listener = new MqttMessageHandler(this.mqttCustomClient);
             this.mqttCustomClient.getMqttClient().setCallback(listener);
-            this.mqttTopics.clear();
+            this.deviceMeasurementList.clear();
             this.measurementGrpcService.getAllDeviceMeasurement().forEach(this::addSubscription);
             this.mqttCustomClient.setConnected(true);
         } catch (final MqttException e) {
@@ -63,28 +63,28 @@ public class MqttClientService {
     }
 
     public synchronized void addSubscription(final DeviceMeasurementDto measure) {
-        if (this.mqttTopics.contains(measure)) {
+        if (this.deviceMeasurementList.contains(measure)) {
             log.warn("Topic already exists: " + measure);
             return;
         }
         log.info("New topic added: " + measure);
-        this.mqttTopics.add(measure);
+        this.deviceMeasurementList.add(measure);
         this.subscribeTopic(measure);
     }
 
     public synchronized void removeSubscription(final DeviceMeasurementDto measure) {
-        if (!this.mqttTopics.contains(measure)) {
+        if (!this.deviceMeasurementList.contains(measure)) {
             log.warn("Topic does not exist: " + measure);
             return;
         }
         log.info("Topic to remove: " + measure);
-        this.mqttTopics.remove(measure);
+        this.deviceMeasurementList.remove(measure);
         this.unsubscribeTopic(measure);
     }
 
     public synchronized void updateSubscription(final DeviceMeasurementDto measure) {
         // Search for the topic with the same serialNumber
-        final DeviceMeasurementDto existingMeasure = this.mqttTopics.stream()
+        final DeviceMeasurementDto existingMeasure = this.deviceMeasurementList.stream()
                 .filter(topic -> topic.deviceMeasurementId().equals(measure.deviceMeasurementId()))
                 .findFirst()
                 .orElse(null);
@@ -101,10 +101,12 @@ public class MqttClientService {
     @Scheduled(fixedRate = 1000)
     private void sendRandomMessages() {
         if (this.mqttCustomClient.isConnected()) {
-            this.mqttTopics.forEach(topic -> {
-                final MqttMessage message = new MqttMessage(this.payloadGenerator.generatePayload(topic).getBytes(StandardCharsets.UTF_8));
+            this.deviceMeasurementList.forEach(measurementDto -> {
+                final MqttMessage message = new MqttMessage(
+                        this.payloadGenerator.generatePayload(measurementDto).getBytes(StandardCharsets.UTF_8)
+                );
                 try {
-                    this.mqttCustomClient.getMqttClient().publish(topic.topic(), message);
+                    this.mqttCustomClient.getMqttClient().publish(measurementDto.topic(), message);
                 } catch (final MqttException e) {
                     log.error(e.getMessage());
                 }

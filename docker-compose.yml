@@ -102,6 +102,20 @@ services:
     build: ./MqttClient
     networks:
       - my-network
+
+  real_time_data_service:
+    container_name: real_time_service
+    restart: always
+    ports:
+      - "8005:8005"
+    depends_on:
+      - iotdeviceservice
+      - mqtt_client_service
+    build: ./RealTimeDataService
+    networks:
+      - my-network
+
+
 networks:
   my-network:
     driver: bridge

@@ -3,7 +3,9 @@ package com.antonigari.RealTimeDataService.service.utilities;
 import com.antonigari.RealTimeDataService.config.websocket.WebSocketCommands;
 import com.antonigari.RealTimeDataService.event.NewMeasureSubscriptionEvent;
 import com.antonigari.RealTimeDataService.event.RemoveMeasureSubscriptionEvent;
+import com.antonigari.RealTimeDataService.model.DeviceMeasurementWebSocketRequest;
 import com.antonigari.RealTimeDataService.model.WebSocketHandlerMessage;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -45,7 +47,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
         final String receivedJson = new String(byteArrayPayload, StandardCharsets.UTF_8);
         System.out.println("Received JSON: " + receivedJson);
         final ObjectMapper objectMapper = new ObjectMapper();
-        final WebSocketHandlerMessage webSocketHandlerMessage = objectMapper.readValue(message.getPayload().toString(), WebSocketHandlerMessage.class);
+        final WebSocketHandlerMessage webSocketHandlerMessage = objectMapper.readValue(receivedJson, WebSocketHandlerMessage.class);
         this.handleEventMessage(webSocketHandlerMessage, session);
         for (final WebSocketSession webSocketSession : this.webSocketSessions) {
             webSocketSession.sendMessage(message);
@@ -54,13 +56,15 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
 
     private void handleEventMessage(final WebSocketHandlerMessage webSocketHandlerMessage,
-                                    final WebSocketSession session) {
+                                    final WebSocketSession session) throws JsonProcessingException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final DeviceMeasurementWebSocketRequest deviceMeasurementWebSocketRequest = objectMapper.readValue(webSocketHandlerMessage.payload(), DeviceMeasurementWebSocketRequest.class);
         switch (WebSocketCommands.valueOf(webSocketHandlerMessage.command())) {
             case SUBSCRIBE:
-                this.eventPublisher.publishEvent(new NewMeasureSubscriptionEvent(this, webSocketHandlerMessage.payload(), session));
+                this.eventPublisher.publishEvent(new NewMeasureSubscriptionEvent(this, deviceMeasurementWebSocketRequest.topic(), session));
                 break;
             case REMOVE:
-                this.eventPublisher.publishEvent(new RemoveMeasureSubscriptionEvent(this, webSocketHandlerMessage.payload(), session));
+                this.eventPublisher.publishEvent(new RemoveMeasureSubscriptionEvent(this, deviceMeasurementWebSocketRequest.topic(), session));
                 break;
             default:
                 break;

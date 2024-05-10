@@ -45,8 +45,7 @@ public class MqttMessageHandler implements org.eclipse.paho.mqttv5.client.MqttCa
                 .forEach(webSocketSession -> {
                             try {
                                 webSocketSession
-                                        .sendMessage(new TextMessage("Received " + messagePayload + " !")
-                                        );
+                                        .sendMessage(new TextMessage(messagePayload));
                             } catch (final IOException e) {
                                 log.error(String.format("Error Websocket with reason %s", e.getMessage()));
                             }

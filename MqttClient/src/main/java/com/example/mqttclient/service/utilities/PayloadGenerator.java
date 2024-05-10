@@ -18,28 +18,34 @@ public class PayloadGenerator {
         final ObjectMapper objectMapper = new ObjectMapper();
 
         try {
-            return objectMapper.writeValueAsString(this.buildPayload(measure.measurementType().typeName()));
+            return objectMapper.writeValueAsString(this.buildPayload(measure.measurementType().typeName(), measure));
         } catch (final JsonProcessingException e) {
             log.error(e.getMessage());
             return "";
         }
     }
 
-    private DeviceMeasurementPayloadDto buildPayload(final MeasurementTypeName type) {
+    private DeviceMeasurementPayloadDto buildPayload(final MeasurementTypeName type, final DeviceMeasurementDto measurementDto) {
         switch (type) {
             case STRING -> {
                 return DeviceMeasurementPayloadDto.builder()
                         .stringValue(this.getRandomString())
+                        .deviceMeasurementId(measurementDto.deviceMeasurementId())
+                        .topic(measurementDto.topic())
                         .build();
             }
             case BOOLEAN -> {
                 return DeviceMeasurementPayloadDto.builder()
                         .booleanValue(this.getRandomBoolean())
+                        .deviceMeasurementId(measurementDto.deviceMeasurementId())
+                        .topic(measurementDto.topic())
                         .build();
             }
             case NUMERIC -> {
                 return DeviceMeasurementPayloadDto.builder()
                         .numValue(this.getRandomNumeric())
+                        .deviceMeasurementId(measurementDto.deviceMeasurementId())
+                        .topic(measurementDto.topic())
                         .build();
             }
         }

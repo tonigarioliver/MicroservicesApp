@@ -92,11 +92,13 @@ public class DeviceMeasurementService implements IDeviceMeasurementService {
                 .orElseThrow(() -> ServiceErrorCatalog.NOT_FOUND
                         .exception("DeviceMeasurement with ID " + deviceMeasurementId + " not found"));
         existing.setUnit(deviceMeasurementRequestDto.getUnits());
+        existing.setName(deviceMeasurementRequestDto.getMeasurementName());
         final String newTopic = DeviceMeasurement.getTopic(existing.getDevice(), deviceMeasurementRequestDto.getMeasurementName());
         this.checkTopic(newTopic);
-        existing.setName(deviceMeasurementRequestDto.getMeasurementName());
         existing.setTopic(newTopic);
-        return this.conversionService.convert(existing, DeviceMeasurementDto.class);
+        existing.setMeasurementType(this.measurementTypeService.getAsyncById(deviceMeasurementRequestDto.getMeasurementTypeId()).join());
+        existing.setDevice(this.deviceService.getAsyncById(deviceMeasurementRequestDto.getDeviceId()).join());
+        return this.conversionService.convert(this.repository.save(existing), DeviceMeasurementDto.class);
     }
 
     @Override
