@@ -3,7 +3,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { catchError, retry, throwError } from 'rxjs';
 import { DeviceMeasurementFormComponent } from 'src/app/core/components/device-measurement-form/device-measurement-form.component';
 import { DeviceMeasurement } from 'src/app/core/models/device-measurement';
 import { DeviceMeasurementRequest } from 'src/app/core/models/device-measurement-request';
@@ -28,38 +27,27 @@ export class DeviceMeasurementComponent implements OnInit {
     private deviceMeasurementApiService: DeviceMeasurementApiService,
     private deviceDialog: MatDialog,
     private toastService: ToastService,
-    private realTimeService: RealTimeIotService,
+    private realTimeIotService: RealTimeIotService,
   ) {
-    this.connectRealTimeMeasure();
   }
 
   ngOnInit(): void {
     this.tableData.paginator = this.paginator;
     this.tableData.sort = this.sort;
     this.fetchDeviceMeasurements();
+    this.realTimeIotService.connect();
+    this.realTimeIotService.messageReceived.subscribe((message: string) => {
+    })
+    this.realTimeIotService.connected.subscribe((status: boolean) => {
+      this.addRealTimeMeasure(this.tableData.data[0])
+    })
   }
 
-  connectRealTimeMeasure(): void {
-    this.realTimeService.webSocket$
-      .pipe(
-        catchError((error) => {
-          this.interval = 1;
-          this.toastService.showError(error);
-          return throwError(() => error);
-        }),
-        retry({ delay: 5_000 }),
-      )
-      .subscribe((value: any) => {
-        console.log(value);
-      });
-  }
-
-  addRealTimeMeasure(deviceMeasurement: DeviceMeasurement) {
+  addRealTimeMeasure(deviceMeasurement: DeviceMeasurement): void {
     const req: RealTimeWebSocketRequest = {
-      command: "SUBSCRIBE",
-      deviceMeasurement: deviceMeasurement
+      topic: deviceMeasurement.topic
     }
-    this.realTimeService.sendIOTRequest(req);
+    this.realTimeIotService.sendIOTRequest(req);
   }
 
   fetchDeviceMeasurements(): void {
@@ -67,7 +55,7 @@ export class DeviceMeasurementComponent implements OnInit {
       (deviceMeasurements: DeviceMeasurement[]) => {
         console.debug(deviceMeasurements)
         this.tableData.data = deviceMeasurements;
-        this.addRealTimeMeasure(deviceMeasurements[0])
+        //this.addRealTimeMeasure(deviceMeasurements[0])
       },
       (error) => {
         this.toastService.showError(error.message)
