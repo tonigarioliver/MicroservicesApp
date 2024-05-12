@@ -7,6 +7,10 @@ import com.antonigari.RealTimeDataService.model.DeviceMeasurementWebSocketReques
 import com.antonigari.RealTimeDataService.model.WebSocketHandlerMessage;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
@@ -26,6 +30,11 @@ import java.util.List;
 public class WebSocketHandler extends TextWebSocketHandler {
     private ApplicationEventPublisher eventPublisher;
     List<WebSocketSession> webSocketSessions = Collections.synchronizedList(new ArrayList<>());
+    private final ObjectMapper objectMapper = JsonMapper.builder()
+            .addModule(new ParameterNamesModule())
+            .addModule(new Jdk8Module())
+            .addModule(new JavaTimeModule())
+            .build();
 
     @Override
     public void afterConnectionEstablished(final WebSocketSession session) throws Exception {
@@ -46,8 +55,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
         final byte[] byteArrayPayload = ((TextMessage) message).asBytes();
         final String receivedJson = new String(byteArrayPayload, StandardCharsets.UTF_8);
         System.out.println("Received JSON: " + receivedJson);
-        final ObjectMapper objectMapper = new ObjectMapper();
-        final WebSocketHandlerMessage webSocketHandlerMessage = objectMapper.readValue(receivedJson, WebSocketHandlerMessage.class);
+        final WebSocketHandlerMessage webSocketHandlerMessage = this.objectMapper.readValue(receivedJson, WebSocketHandlerMessage.class);
         this.handleEventMessage(webSocketHandlerMessage, session);
         for (final WebSocketSession webSocketSession : this.webSocketSessions) {
             webSocketSession.sendMessage(message);
@@ -57,8 +65,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
     private void handleEventMessage(final WebSocketHandlerMessage webSocketHandlerMessage,
                                     final WebSocketSession session) throws JsonProcessingException {
-        final ObjectMapper objectMapper = new ObjectMapper();
-        final DeviceMeasurementWebSocketRequest deviceMeasurementWebSocketRequest = objectMapper.readValue(webSocketHandlerMessage.payload(), DeviceMeasurementWebSocketRequest.class);
+        final DeviceMeasurementWebSocketRequest deviceMeasurementWebSocketRequest = this.objectMapper.readValue(webSocketHandlerMessage.payload(), DeviceMeasurementWebSocketRequest.class);
         switch (WebSocketCommands.valueOf(webSocketHandlerMessage.command())) {
             case SUBSCRIBE:
                 this.eventPublisher.publishEvent(new NewMeasureSubscriptionEvent(this, deviceMeasurementWebSocketRequest.topic(), session));

@@ -102,7 +102,6 @@ public class MqttClientService {
     private void unsubscribeTopic(final DeviceMeasurementDto measure) {
         try {
             this.mqttCustomClient.getMqttClient().unsubscribe(measure.topic());
-            this.webSocketClientManager.removeWebSocketClientsWhenTopicRemoved(measure.topic());
         } catch (final MqttException e) {
             log.error(e.getMessage());
         }

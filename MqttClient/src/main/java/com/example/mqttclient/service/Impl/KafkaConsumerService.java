@@ -4,6 +4,10 @@ import com.example.mqttclient.data.model.DeviceMeasurementDto;
 import com.example.mqttclient.service.IKafkaConsumerService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -15,6 +19,11 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class KafkaConsumerService implements IKafkaConsumerService {
     private final MqttClientService mqttClientService;
+    private final ObjectMapper objectMapper = JsonMapper.builder()
+            .addModule(new ParameterNamesModule())
+            .addModule(new Jdk8Module())
+            .addModule(new JavaTimeModule())
+            .build();
 
     @Override
     @KafkaListener(topics = "#{'${spring.kafka.consumer.topics}'.split(',')}", groupId = "${spring.kafka.consumer.group-id}")
@@ -22,8 +31,7 @@ public class KafkaConsumerService implements IKafkaConsumerService {
         log.info(payload);
         final DeviceMeasurementDto measure;
         try {
-            final ObjectMapper objectMapper = new ObjectMapper();
-            measure = objectMapper.readValue(payload, DeviceMeasurementDto.class);
+            measure = this.objectMapper.readValue(payload, DeviceMeasurementDto.class);
             this.processMessage(topic, measure);
 
         } catch (final JsonProcessingException e) {
@@ -33,13 +41,13 @@ public class KafkaConsumerService implements IKafkaConsumerService {
 
     private void processMessage(final String topic, final DeviceMeasurementDto measure) {
         switch (topic) {
-            case "new-device":
+            case "CREATE_DEVICE_MEASUREMENT":
                 this.mqttClientService.addSubscription(measure);
                 break;
-            case "update-device":
+            case "UPDATE_DEVICE_MEASUREMENT":
                 this.mqttClientService.updateSubscription(measure);
                 break;
-            case "delete-device":
+            case "DELETE_DEVICE_MEASUREMENT":
                 this.mqttClientService.removeSubscription(measure);
                 break;
             default:

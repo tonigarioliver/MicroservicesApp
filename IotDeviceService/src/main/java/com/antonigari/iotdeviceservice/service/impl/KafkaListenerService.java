@@ -5,6 +5,10 @@ import com.antonigari.iotdeviceservice.service.IDeviceMeasurementPayloadService;
 import com.antonigari.iotdeviceservice.service.IKafkaListenerService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -16,6 +20,11 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class KafkaListenerService implements IKafkaListenerService<String, String> {
     private final IDeviceMeasurementPayloadService deviceMeasurementPayloadService;
+    private final ObjectMapper objectMapper = JsonMapper.builder()
+            .addModule(new ParameterNamesModule())
+            .addModule(new Jdk8Module())
+            .addModule(new JavaTimeModule())
+            .build();
 
     @Override
     @KafkaListener(topics = "#{'${spring.kafka.consumer.topics}'.split(',')}", groupId = "${spring.kafka.consumer.group-id}")
@@ -23,8 +32,7 @@ public class KafkaListenerService implements IKafkaListenerService<String, Strin
         log.info(payload);
         final DeviceMeasurementPayloadRequestDto deviceMeasurementPayload;
         try {
-            final ObjectMapper objectMapper = new ObjectMapper();
-            deviceMeasurementPayload = objectMapper.readValue(payload, DeviceMeasurementPayloadRequestDto.class);
+            deviceMeasurementPayload = this.objectMapper.readValue(payload, DeviceMeasurementPayloadRequestDto.class);
             this.processMessage(topic, deviceMeasurementPayload);
 
         } catch (final JsonProcessingException e) {

@@ -8,7 +8,7 @@ spring:
     bootstrap-servers: kafka:9092
     consumer:
       group-id: iot-mqtt-client-service
-      topics: "new-device,delete-device,update-device"
+      topics: "CREATE_DEVICE_MEASUREMENT,UPDATE_DEVICE_MEASUREMENT,DELETE_DEVICE_MEASUREMENT"
 grpc:
   server:
     address: iotdeviceservice

@@ -73,7 +73,7 @@ public class DeviceMeasurementService implements IDeviceMeasurementService {
     public DeviceMeasurementDto create(final DeviceMeasurementRequestDto deviceMeasurementRequestDto) {
         final Device device = this.deviceService.getAsyncById(deviceMeasurementRequestDto.getDeviceId()).join();
         final String topic = DeviceMeasurement.getTopic(device, deviceMeasurementRequestDto.getMeasurementName());
-        this.checkTopic(topic);
+        this.checkTopic(topic, null);
         final DeviceMeasurement newMeasure = DeviceMeasurement.builder()
                 .device(device)
                 .measurementType(this.measurementTypeService
@@ -94,7 +94,7 @@ public class DeviceMeasurementService implements IDeviceMeasurementService {
         existing.setUnit(deviceMeasurementRequestDto.getUnits());
         existing.setName(deviceMeasurementRequestDto.getMeasurementName());
         final String newTopic = DeviceMeasurement.getTopic(existing.getDevice(), deviceMeasurementRequestDto.getMeasurementName());
-        this.checkTopic(newTopic);
+        this.checkTopic(newTopic, existing);
         existing.setTopic(newTopic);
         existing.setMeasurementType(this.measurementTypeService.getAsyncById(deviceMeasurementRequestDto.getMeasurementTypeId()).join());
         existing.setDevice(this.deviceService.getAsyncById(deviceMeasurementRequestDto.getDeviceId()).join());
@@ -109,11 +109,13 @@ public class DeviceMeasurementService implements IDeviceMeasurementService {
         this.repository.delete(deviceMeasurementDelete);
     }
 
-    private void checkTopic(final String topic) {
+    private void checkTopic(final String topic, final DeviceMeasurement currentMeasurement) {
         this.repository.findByTopic(topic)
                 .ifPresent(measurement -> {
-                    throw ServiceErrorCatalog
-                            .CONFLICT.exception("DeviceMeasuremnt with topic " + topic + " already exists");
+                    if (!measurement.equals(currentMeasurement)) {
+                        throw ServiceErrorCatalog
+                                .CONFLICT.exception("DeviceMeasuremnt with topic " + topic + " already exists");
+                    }
                 });
     }
 }

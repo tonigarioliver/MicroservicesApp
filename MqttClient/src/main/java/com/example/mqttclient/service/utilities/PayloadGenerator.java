@@ -5,6 +5,11 @@ import com.example.mqttclient.data.model.DeviceMeasurementPayloadDto;
 import com.example.mqttclient.data.model.MeasurementTypeName;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -12,13 +17,17 @@ import java.util.Random;
 
 @Component
 @Slf4j
+@AllArgsConstructor
 public class PayloadGenerator {
+    private final ObjectMapper objectMapper = JsonMapper.builder()
+            .addModule(new ParameterNamesModule())
+            .addModule(new Jdk8Module())
+            .addModule(new JavaTimeModule())
+            .build();
 
     public String generatePayload(final DeviceMeasurementDto measure) {
-        final ObjectMapper objectMapper = new ObjectMapper();
-
         try {
-            return objectMapper.writeValueAsString(this.buildPayload(measure.measurementType().typeName(), measure));
+            return this.objectMapper.writeValueAsString(this.buildPayload(measure.measurementType().typeName(), measure));
         } catch (final JsonProcessingException e) {
             log.error(e.getMessage());
             return "";

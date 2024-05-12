@@ -38,8 +38,8 @@ public class WebSocketClientManager {
             final String newMeasurementDto
     ) {
         this.webSocketClients.computeIfPresent(oldMeasurementDto, (dto, sessions) -> {
-            this.webSocketClients.remove(dto);
             this.webSocketClients.put(newMeasurementDto, sessions);
+            this.webSocketClients.remove(dto);
             return sessions;
         });
     }
