@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
@@ -121,12 +120,5 @@ public class MqttClientService {
 
     public void removeWebSocketClientTopic(final WebSocketSession session, final String topic) {
         this.webSocketClientManager.removeWebSocketClientTopic(session, topic);
-
-        this.webSocketClientManager.getKeysWithEmptyLists().stream()
-                .map(t -> this.measurements.stream().filter(measurementDto -> measurementDto.topic().equals(t)).findFirst())
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .forEach(this::removeSubscription);
-
     }
 }
