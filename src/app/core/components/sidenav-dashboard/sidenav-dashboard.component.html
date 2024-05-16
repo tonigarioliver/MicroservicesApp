@@ -15,6 +15,12 @@
       </mat-nav-list>
     </mat-drawer>
     <mat-drawer-content>
+      <div *ngFor="let deviceMeasurement of deviceMeasurements">
+        <mat-checkbox (change)="onDeviceMeasurementSelect($event, deviceMeasurement)">
+          {{ deviceMeasurement.name }}
+        </mat-checkbox>
+        <p [innerHTML]="response"></p>
+      </div>
       <div style="text-align: center; min-height: 600px;">
         <ng-container *ngFor="let component of componentsToShow">
           <ng-container *ngIf="component.visible">
@@ -24,5 +30,4 @@
       </div>
     </mat-drawer-content>
   </mat-drawer-container>
-
 </div>

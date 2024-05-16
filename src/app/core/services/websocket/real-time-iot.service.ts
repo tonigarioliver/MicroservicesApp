@@ -14,9 +14,16 @@ export class RealTimeIotService extends WebsocketService {
   public override connect(): void {
     super.connect()
   }
-  public sendIOTRequest(req: RealTimeWebSocketRequest): void {
+  public sendSubscribeIOTRequest(req: RealTimeWebSocketRequest): void {
     const message: WebSocketMessage = {
       command: "SUBSCRIBE",
+      payload: JSON.stringify(req)
+    }
+    this.sendMessage(message)
+  }
+  public sendUnsusbscribeIOTRequest(req: RealTimeWebSocketRequest): void {
+    const message: WebSocketMessage = {
+      command: "REMOVE",
       payload: JSON.stringify(req)
     }
     this.sendMessage(message)

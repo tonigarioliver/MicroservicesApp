@@ -8,6 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { DeviceMeasurementModule } from 'src/app/core/components/device-measurement/device-measurement.module';
 import { DeviceModelModule } from 'src/app/core/components/device-model/device-model.module';
 import { DeviceModule } from 'src/app/core/components/device/device.module';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 
 @NgModule({
@@ -24,7 +25,8 @@ import { DeviceModule } from 'src/app/core/components/device/device.module';
     MatSidenavModule,
     DeviceModule,
     DeviceModelModule,
-    DeviceMeasurementModule
+    DeviceMeasurementModule,
+    MatCheckboxModule,
   ],
   exports: [
     SidenavDashboardComponent

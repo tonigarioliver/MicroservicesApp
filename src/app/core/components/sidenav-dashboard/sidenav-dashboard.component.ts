@@ -1,10 +1,13 @@
-import { Component, ViewChild, OnInit } from '@angular/core';
-import { MatSidenav } from '@angular/material/sidenav';
-import { Router } from '@angular/router';
+import { Component } from '@angular/core';
+import { MatCheckboxChange } from '@angular/material/checkbox';
 import { DeviceMeasurementComponent } from 'src/app/core/components/device-measurement/device-measurement.component';
 import { DeviceModelComponent } from 'src/app/core/components/device-model/device-model.component';
 import { DeviceComponent } from 'src/app/core/components/device/device.component';
-import { DashboardComponent } from 'src/app/core/pages/dashboard/dashboard.component';
+import { DeviceMeasurement } from 'src/app/core/models/device-measurement';
+import { RealTimeWebSocketRequest } from 'src/app/core/models/real-time-iot-message';
+import { DeviceMeasurementApiService } from 'src/app/core/services/api/device-measurement-api.service';
+import { ToastService } from 'src/app/core/services/toast.service';
+import { RealTimeIotService } from 'src/app/core/services/websocket/real-time-iot.service';
 interface ComponentToShow {
   name: string;
   component: any; // Type of the component
@@ -22,9 +25,37 @@ export class SidenavDashboardComponent {
     { name: 'devices', component: DeviceComponent, visible: false },
     { name: 'device-models', component: DeviceModelComponent, visible: false },
   ];
+  response: String = ''
   isMenuOpen = false;
+  deviceMeasurements: DeviceMeasurement[] = []
+
+  constructor(
+    private deviceMeasurementApiService: DeviceMeasurementApiService,
+    private toastService: ToastService,
+    private realTimeIotService: RealTimeIotService,
+  ) {
+
+  }
+
+  onDeviceMeasurementSelect(event: MatCheckboxChange, measurement: DeviceMeasurement) {
+    const req: RealTimeWebSocketRequest = {
+      topic: measurement.topic
+    }
+    if (event.checked) {
+      this.realTimeIotService.sendSubscribeIOTRequest(req)
+    } else {
+      this.realTimeIotService.sendUnsusbscribeIOTRequest(req)
+    }
+  }
 
   ngOnInit() {
+    this.realTimeIotService.connect();
+    this.realTimeIotService.connected.subscribe((status: boolean) => {
+      this.realTimeIotService.messageReceived.subscribe((message: string) => {
+        this.response = message
+      })
+      this.fetchDeviceMeasurements();
+    })
   }
   toggleMenu() {
     this.isMenuOpen = !this.isMenuOpen;
@@ -41,5 +72,17 @@ export class SidenavDashboardComponent {
       }
     });
   }
+
+  private fetchDeviceMeasurements(): void {
+    this.deviceMeasurementApiService.getDeviceMeasurements().subscribe(
+      (deviceMeasurements: DeviceMeasurement[]) => {
+        this.deviceMeasurements = deviceMeasurements;
+      },
+      (error) => {
+        this.toastService.showError(error.message)
+      }
+    );
+  }
+
 
 }
