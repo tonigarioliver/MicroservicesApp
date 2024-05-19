@@ -3,6 +3,7 @@ package com.antonigari.RealTimeDataService.service.utilities;
 import com.antonigari.RealTimeDataService.config.websocket.WebSocketCommands;
 import com.antonigari.RealTimeDataService.event.NewMeasureSubscriptionEvent;
 import com.antonigari.RealTimeDataService.event.RemoveMeasureSubscriptionEvent;
+import com.antonigari.RealTimeDataService.event.WebSocketDisconnectedEvent;
 import com.antonigari.RealTimeDataService.model.DeviceMeasurementWebSocketRequest;
 import com.antonigari.RealTimeDataService.model.WebSocketHandlerMessage;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -46,20 +47,17 @@ public class WebSocketHandler extends TextWebSocketHandler {
     public void afterConnectionClosed(final WebSocketSession session, final CloseStatus status) throws Exception {
         super.afterConnectionClosed(session, status);
         this.webSocketSessions.remove(session);
+        this.eventPublisher.publishEvent(new WebSocketDisconnectedEvent(this, session));
     }
 
     @Override
     public void handleMessage(final WebSocketSession session, final WebSocketMessage<?> message) throws Exception {
-
         super.handleMessage(session, message);
         final byte[] byteArrayPayload = ((TextMessage) message).asBytes();
         final String receivedJson = new String(byteArrayPayload, StandardCharsets.UTF_8);
         System.out.println("Received JSON: " + receivedJson);
         final WebSocketHandlerMessage webSocketHandlerMessage = this.objectMapper.readValue(receivedJson, WebSocketHandlerMessage.class);
         this.handleEventMessage(webSocketHandlerMessage, session);
-        for (final WebSocketSession webSocketSession : this.webSocketSessions) {
-            webSocketSession.sendMessage(message);
-        }
     }
 
 

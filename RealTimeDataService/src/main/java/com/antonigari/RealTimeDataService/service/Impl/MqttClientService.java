@@ -114,11 +114,15 @@ public class MqttClientService {
         }
     }
 
-    public void addWebSocketClient(final WebSocketSession session, final String topic) {
+    public void addWebSocketClientTopic(final WebSocketSession session, final String topic) {
         this.webSocketClientManager.subscribe(session, topic);
     }
 
     public void removeWebSocketClientTopic(final WebSocketSession session, final String topic) {
         this.webSocketClientManager.removeWebSocketClientTopic(session, topic);
+    }
+
+    public void webSocketClientListenerDisconnected(final WebSocketSession session) {
+        this.webSocketClientManager.removeWebSocketClient(session);
     }
 }
