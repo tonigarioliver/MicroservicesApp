@@ -24,7 +24,6 @@ export class WebsocketService {
 
     this.socket.onmessage = (event) => {
       const message = event.data;
-      console.log('Received message:', message);
       this.messageReceived.next(message);
     };
 

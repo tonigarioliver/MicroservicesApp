@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { DeviceMeasurementComponent } from 'src/app/core/components/device-measurement/device-measurement.component';
 import { DeviceModelComponent } from 'src/app/core/components/device-model/device-model.component';
 import { DeviceComponent } from 'src/app/core/components/device/device.component';
 import { DeviceMeasurement } from 'src/app/core/models/device-measurement';
+import { DeviceMeasurementPayload } from 'src/app/core/models/device-measurement-payload';
 import { RealTimeWebSocketRequest } from 'src/app/core/models/real-time-iot-message';
 import { DeviceMeasurementApiService } from 'src/app/core/services/api/device-measurement-api.service';
 import { ToastService } from 'src/app/core/services/toast.service';
@@ -19,13 +20,14 @@ interface ComponentToShow {
   templateUrl: './sidenav-dashboard.component.html',
   styleUrls: ['./sidenav-dashboard.component.scss']
 })
-export class SidenavDashboardComponent {
+export class SidenavDashboardComponent implements OnInit, OnDestroy {
   componentsToShow: ComponentToShow[] = [
     { name: 'device-measurement', component: DeviceMeasurementComponent, visible: false },
     { name: 'devices', component: DeviceComponent, visible: false },
     { name: 'device-models', component: DeviceModelComponent, visible: false },
   ];
   response: String = ''
+  public values: number[] = []
   isMenuOpen = false;
   deviceMeasurements: DeviceMeasurement[] = []
 
@@ -51,12 +53,15 @@ export class SidenavDashboardComponent {
   ngOnInit() {
     this.realTimeIotService.connect();
     this.realTimeIotService.connected.subscribe((status: boolean) => {
-      this.realTimeIotService.messageReceived.subscribe((message: string) => {
-        this.response = message
-      })
       this.fetchDeviceMeasurements();
+      this.listenToMeasures();
     })
   }
+
+  ngOnDestroy() {
+    this.realTimeIotService.closeConnection()
+  }
+
   toggleMenu() {
     this.isMenuOpen = !this.isMenuOpen;
     if (!this.isMenuOpen) {
@@ -80,6 +85,15 @@ export class SidenavDashboardComponent {
       },
       (error) => {
         this.toastService.showError(error.message)
+      }
+    );
+  }
+  private listenToMeasures(): void {
+    this.realTimeIotService.listenMeasuresPayload.subscribe(
+      (payload: DeviceMeasurementPayload) => {
+        console.log(payload)
+        const position = this.deviceMeasurements.findIndex(deviceMeasurement => deviceMeasurement.deviceMeasurementId === payload.deviceMeasurementId);
+        this.values[position] = payload.numValue
       }
     );
   }
