@@ -1,7 +1,17 @@
 version: "3.8"
 
 services:
-  # mqtt5 eclipse-mosquitto
+
+  eurekaserver:
+    container_name: eurekaserver
+    restart: always
+    ports:
+      - "8761:8761"
+    build: ./EurekaServer
+    networks:
+      - my-network
+
+      # mqtt5 eclipse-mosquitto
   mqtt5:
     image: eclipse-mosquitto
     container_name: mqtt5
@@ -19,6 +29,8 @@ services:
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     restart: always
+    depends_on:
+      - eurekaserver
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
@@ -32,6 +44,7 @@ services:
     restart: always
     depends_on:
       - zookeeper
+      - eurekaserver
     ports:
       - 29092:29092
     environment:
@@ -48,6 +61,8 @@ services:
     image: postgres
     container_name: MicroservicesApp-postgres
     restart: always
+    depends_on:
+      - eurekaserver
     ports:
       - "5435:5432"
     environment:
@@ -69,6 +84,7 @@ services:
       PGADMIN_DEFAULT_EMAIL: user@domain.com
       PGADMIN_DEFAULT_PASSWORD: postgres
     depends_on:
+      - eurekaserver
       - postgres_db
     volumes:
       - pgadmin-data:/var/lib/pgadmin
@@ -89,6 +105,7 @@ services:
       - "8001:8001"
       - "9090:9090"
     depends_on:
+      - eurekaserver
       - postgres_db
     networks:
       - my-network
@@ -97,6 +114,7 @@ services:
     container_name: mqtt_client_service
     restart: always
     depends_on:
+      - eurekaserver
       - iotdeviceservice
       - mqtt5
     build: ./MqttClient
@@ -109,6 +127,7 @@ services:
     ports:
       - "8005:8005"
     depends_on:
+      - eurekaserver
       - iotdeviceservice
       - mqtt_client_service
     build: ./RealTimeDataService

@@ -15,6 +15,13 @@ spring:
     consumer:
       group-id: iot-info-service
       topics: "new-measure-payload,update-measure-payload,delete-measure-payload,"
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eurekaserver:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
 grpc:
   server:
     port: 9090
