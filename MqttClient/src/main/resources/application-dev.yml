@@ -9,6 +9,13 @@ spring:
     consumer:
       group-id: iot-mqtt-client-service
       topics: "CREATE_DEVICE_MEASUREMENT,UPDATE_DEVICE_MEASUREMENT,DELETE_DEVICE_MEASUREMENT"
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
 grpc:
   server:
     address: localhost

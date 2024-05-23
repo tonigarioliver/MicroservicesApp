@@ -1,6 +1,8 @@
 spring:
   profiles:
     active: dev
+  application:
+    name: RealTimeDataService
 server:
   port: 8005
 management:
