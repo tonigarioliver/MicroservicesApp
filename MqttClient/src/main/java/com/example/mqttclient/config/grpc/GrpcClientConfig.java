@@ -1,6 +1,7 @@
 package com.example.mqttclient.config.grpc;
 
 import com.antonigari.MqttClient.DeviceMeasurementGrpcServiceGrpc;
+import com.example.mqttclient.service.IClientsDiscoveryService;
 import io.grpc.ManagedChannelBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -8,15 +9,18 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class GrpcClientConfig {
-    @Value(value = "${grpc.server.port}")
-    int grpcServerPort;
-    @Value(value = "${grpc.server.address}")
-    String grpcServerAddress;
+    @Value(value = "${grpc.service.name}")
+    String grpcServerServiceName;
 
     @Bean
-    DeviceMeasurementGrpcServiceGrpc.DeviceMeasurementGrpcServiceBlockingStub deviceMeasurementGrpcServiceBlockingStub() {
+    DeviceMeasurementGrpcServiceGrpc.DeviceMeasurementGrpcServiceBlockingStub deviceMeasurementGrpcServiceBlockingStub(
+            final IClientsDiscoveryService clientsDiscoveryService
+    ) {
         return DeviceMeasurementGrpcServiceGrpc.newBlockingStub(ManagedChannelBuilder
-                .forAddress(this.grpcServerAddress, this.grpcServerPort)
+                .forAddress(
+                        clientsDiscoveryService.getHost(this.grpcServerServiceName),
+                        clientsDiscoveryService.getPort(this.grpcServerServiceName)
+                )
                 .usePlaintext()
                 .build());
     }

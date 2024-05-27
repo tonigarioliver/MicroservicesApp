@@ -15,8 +15,3 @@ eureka:
       defaultZone: http://localhost:8761/eureka/
   instance:
     prefer-ip-address: true
-
-grpc:
-  server:
-    address: localhost
-    port: 9090

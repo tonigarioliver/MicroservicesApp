@@ -16,9 +16,3 @@ eureka:
       defaultZone: http://eurekaserver:8761/eureka/
   instance:
     prefer-ip-address: true
-
-
-grpc:
-  server:
-    address: iotdeviceservice
-    port: 9090

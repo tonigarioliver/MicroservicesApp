@@ -1,6 +1,6 @@
-package com.antonigari.RealTimeDataService.service.Impl;
+package com.example.mqttclient.service.Impl;
 
-import com.antonigari.RealTimeDataService.service.ClientsDiscoveryService;
+import com.example.mqttclient.service.IClientsDiscoveryService;
 import lombok.AllArgsConstructor;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -10,7 +10,7 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class EurekaClientDiscovery implements ClientsDiscoveryService {
+public class EurekaClientDiscoveryService implements IClientsDiscoveryService {
 
     private DiscoveryClient discoveryClient;
 

@@ -11,4 +11,7 @@ management:
 security:
   basic:
     enabled: false
+grpc:
+  service:
+    name: GRPCSERVERSERVICE
 
