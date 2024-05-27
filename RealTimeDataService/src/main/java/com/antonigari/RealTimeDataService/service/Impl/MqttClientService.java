@@ -5,10 +5,11 @@ import com.antonigari.RealTimeDataService.config.mqtt.MqttCustomClient;
 import com.antonigari.RealTimeDataService.model.DeviceMeasurementDto;
 import com.antonigari.RealTimeDataService.service.utilities.MqttMessageHandler;
 import com.antonigari.RealTimeDataService.service.utilities.WebSocketClientManager;
-import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.mqttv5.common.MqttException;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -29,7 +30,7 @@ public class MqttClientService {
     private final WebSocketClientManager webSocketClientManager;
 
 
-    @PostConstruct
+    @EventListener(ApplicationReadyEvent.class)
     public void initialize() {
         try {
             final CompletableFuture<Void> connectionFuture = this.mqttConnectAsync();

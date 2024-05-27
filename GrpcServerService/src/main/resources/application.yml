@@ -1,0 +1,9 @@
+spring:
+  main:
+    web-application-type: none
+  profiles:
+    active: dev
+  application:
+    name: GrpcServerService
+server:
+  port: 9090

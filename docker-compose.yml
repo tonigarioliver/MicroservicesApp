@@ -10,6 +10,19 @@ services:
     build: ./EurekaServer
     networks:
       - my-network
+        
+  
+  grpcserverservice:
+    container_name: grpcserverservice
+    restart: always
+    depends_on:
+      - eurekaserver
+      - postgres_db
+    ports:
+      - "9090:9090"
+    build: ./GrpcServerService
+    networks:
+      - my-network
 
       # mqtt5 eclipse-mosquitto
   mqtt5:
@@ -103,7 +116,6 @@ services:
     restart: always
     ports:
       - "8001:8001"
-      - "9090:9090"
     depends_on:
       - eurekaserver
       - postgres_db
@@ -128,7 +140,7 @@ services:
       - "8005:8005"
     depends_on:
       - eurekaserver
-      - iotdeviceservice
+      - grpcserverservice
       - mqtt_client_service
     build: ./RealTimeDataService
     networks:
