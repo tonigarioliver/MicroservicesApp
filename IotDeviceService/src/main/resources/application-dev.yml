@@ -24,6 +24,3 @@ eureka:
     prefer-ip-address: true
     ip-address: 127.0.0.1
     use-ip-address: false
-grpc:
-  server:
-    port: 9090
