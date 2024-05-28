@@ -1,30 +1,7 @@
 version: "3.8"
 
 services:
-
-  eurekaserver:
-    container_name: eurekaserver
-    restart: always
-    ports:
-      - "8761:8761"
-    build: ./EurekaServer
-    networks:
-      - my-network
-        
-  
-  grpcserverservice:
-    container_name: grpcserverservice
-    restart: always
-    depends_on:
-      - eurekaserver
-      - postgres_db
-    ports:
-      - "9090:9090"
-    build: ./GrpcServerService
-    networks:
-      - my-network
-
-      # mqtt5 eclipse-mosquitto
+  # mqtt5 eclipse-mosquitto
   mqtt5:
     image: eclipse-mosquitto
     container_name: mqtt5
@@ -38,12 +15,11 @@ services:
     networks:
       - my-network
 
-
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     restart: always
     depends_on:
-      - eurekaserver
+      - mqtt5
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
@@ -57,7 +33,6 @@ services:
     restart: always
     depends_on:
       - zookeeper
-      - eurekaserver
     ports:
       - 29092:29092
     environment:
@@ -75,7 +50,7 @@ services:
     container_name: MicroservicesApp-postgres
     restart: always
     depends_on:
-      - eurekaserver
+      - mqtt5
     ports:
       - "5435:5432"
     environment:
@@ -84,6 +59,31 @@ services:
       POSTGRES_DB: microservices
     volumes:
       - local_pgdata:/var/lib/postgresql/data
+    networks:
+      - my-network
+
+  eurekaserver:
+    container_name: eurekaserver
+    restart: always
+    depends_on:
+      - mqtt5
+      - kafka
+      - postgres_db
+    ports:
+      - "8761:8761"
+    build: ./EurekaServer
+    networks:
+      - my-network
+
+  
+  grpcserverservice:
+    container_name: grpcserverservice
+    restart: always
+    depends_on:
+      - eurekaserver
+    ports:
+      - "9090:9090"
+    build: ./GrpcServerService
     networks:
       - my-network
 
@@ -98,17 +98,10 @@ services:
       PGADMIN_DEFAULT_PASSWORD: postgres
     depends_on:
       - eurekaserver
-      - postgres_db
     volumes:
       - pgadmin-data:/var/lib/pgadmin
     networks:
       - my-network
-
-      #user_service:
-      #container_name: user_service
-      #build: ./UserService
-      #ports:
-      #- "8000:8000"
 
   iotdeviceservice:
     container_name: iotdeviceservice
@@ -118,7 +111,6 @@ services:
       - "8001:8001"
     depends_on:
       - eurekaserver
-      - postgres_db
     networks:
       - my-network
 
@@ -127,8 +119,7 @@ services:
     restart: always
     depends_on:
       - eurekaserver
-      - iotdeviceservice
-      - mqtt5
+      - grpcserverservice
     build: ./MqttClient
     networks:
       - my-network
