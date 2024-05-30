@@ -1,0 +1,13 @@
+spring:
+  profiles:
+    active: dev
+  application:
+    name: ApiGatewayService
+services:
+  grpcService:
+    name: GRPCSERVERSERVICE
+  iotDeviceService:
+    name: IOTDEVICESERVICE
+  RealTimeDataService:
+    name: REALTIMEDATASERVICE
+
