@@ -1,11 +1,6 @@
 package com.antonigari.ApiGatewayService.configuration;
 
-import lombok.AllArgsConstructor;
-import org.springframework.cloud.gateway.route.RouteLocator;
-import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
+/*
 @Configuration
 @AllArgsConstructor
 public class RouterConfiguration {
@@ -22,4 +17,4 @@ public class RouterConfiguration {
                         .uri("lb://SERVICE-NAME2"))
                 .build();
     }
-}
+}*/

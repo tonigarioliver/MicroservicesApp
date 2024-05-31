@@ -3,6 +3,26 @@ spring:
     active: dev
   application:
     name: ApiGatewayService
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: iot-device-service
+          uri: lb://IOTDEVICESERVICE
+          predicates:
+            - Path=/iotDeviceService/**
+          filters:
+            - StripPrefix=1
+            
+        - id: real-time-data-service
+          uri: lb://REALTIMEDATASERVICE
+          predicates:
+            - Path=/realTimeDataService/**
+          filters:
+            - StripPrefix=1
 services:
   grpcService:
     name: GRPCSERVERSERVICE
@@ -10,4 +30,5 @@ services:
     name: IOTDEVICESERVICE
   RealTimeDataService:
     name: REALTIMEDATASERVICE
+
 

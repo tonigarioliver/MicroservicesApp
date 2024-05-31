@@ -75,6 +75,17 @@ services:
     networks:
       - my-network
 
+  api-gateway-service:
+    container_name: api-gateway-service
+    restart: always
+    depends_on:
+      - real_time_data_service
+    ports:
+      - "8080:8080"
+    build: ./ApiGatewayService
+    networks:
+      - my-network
+
   
   grpcserverservice:
     container_name: grpcserverservice
