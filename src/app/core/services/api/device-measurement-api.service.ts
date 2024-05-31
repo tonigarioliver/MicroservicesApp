@@ -11,7 +11,7 @@ import { DeviceMeasurementDetails } from 'src/app/core/models/device-measurement
 })
 export class DeviceMeasurementApiService {
 
-  private baseUrl = 'http://localhost:8001/api/v1/device-measurements'; // Reemplaza con la URL de tu API
+  private baseUrl = 'http://localhost:8080/iotDeviceService/api/v1/device-measurements'; // Reemplaza con la URL de tu API
 
   constructor(private http: HttpClient) { }
 

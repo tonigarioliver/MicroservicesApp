@@ -7,7 +7,7 @@ import { WebSocketMessage } from 'src/app/core/models/web-socket-message';
   providedIn: 'root'
 })
 export class WebsocketService {
-  private readonly url: string = 'ws://localhost:8005/mqtt'
+  private readonly url: string = 'ws://localhost:8080/realTimeDataService/mqtt'
   private socket: WebSocket | null = null;
   messageReceived: Subject<string> = new Subject<string>();
   connected: Subject<boolean> = new Subject<boolean>();

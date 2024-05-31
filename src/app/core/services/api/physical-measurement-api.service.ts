@@ -9,13 +9,13 @@ import { PhysicalMeasurementRequest } from 'src/app/core/models/physical-measure
 })
 export class PhysicalMeasurementApiService {
 
-  private serviceUrl = 'http://localhost:8001/api/v1/physical-measurements'; // Replace with your API URL
+  private serviceUrl = 'http://localhost:8080/iotDeviceService/api/v1/physical-measurements'; // Replace with your API URL
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getPhysicalMeasurements(): Observable<PhysicalMeasurement[]> {
     return this.http.get<{ physicalMeasurements: PhysicalMeasurement[] }>(this.serviceUrl)
-      .pipe(map(response => response.physicalMeasurements ))
+      .pipe(map(response => response.physicalMeasurements))
   }
 
   createPhysicalMeasurement(physicalMeasurementRequest: PhysicalMeasurementRequest): Observable<PhysicalMeasurement> {

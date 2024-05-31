@@ -8,7 +8,7 @@ import { MeasurementType } from 'src/app/core/models/measurement-type';
   providedIn: 'root'
 })
 export class MeasurementTypeApiService {
-  private baseUrl = 'http://localhost:8001/api/v1/device-measurement-type'
+  private baseUrl = 'http://localhost:8080/iotDeviceService/api/v1/device-measurement-type'
 
   constructor(private http: HttpClient) { }
 

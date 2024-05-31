@@ -9,7 +9,7 @@ import { DeviceRequest } from 'src/app/core/models/device-request';
 })
 export class DeviceApiService {
 
-  private serviceUrl = 'http://localhost:8001/api/v1/devices'; // Replace with your API URL
+  private serviceUrl = 'http://localhost:8080/iotDeviceService/api/v1/devices'; // Replace with your API URL
 
   constructor(private http: HttpClient) { }
 
