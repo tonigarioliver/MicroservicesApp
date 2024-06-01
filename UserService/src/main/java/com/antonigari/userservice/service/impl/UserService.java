@@ -40,11 +40,6 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public JwtService getJwtService() {
-        return this.jwtService;
-    }
-
-    @Override
     public LoginResponse registerUser(final RegisterUserDto registerUserDto) {
         final AppUser newUser = this.repository.save(AppUser.builder()
                 .username(registerUserDto.userName())
@@ -70,5 +65,15 @@ public class UserService implements IUserService {
                 .token(this.jwtService.generateToken(user))
                 .expiresIn(this.jwtService.getExpirationTime())
                 .build();
+    }
+
+    @Override
+    public boolean isUserTokenValid(final String jwtToken, final String userName) {
+        return this.jwtService.isTokenValid(jwtToken, this.loadUserByUsername(userName));
+    }
+
+    @Override
+    public String getUserNameFromToken(final String jwtToken) {
+        return this.jwtService.extractUsername(jwtToken);
     }
 }

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -46,5 +47,14 @@ public class UserController {
             @RequestBody @NotNull final RegisterUserDto registerUserDto
     ) {
         return new ResponseEntity<>(this.service.registerUser(registerUserDto), HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping("/{jwtToken}/{userName}")
+    @Operation(summary = "Login User", description = "Login a user.")
+    public ResponseEntity<Boolean> isTokenValid(
+            @RequestParam @NotNull final String jwtToken,
+            @RequestParam @NotNull final String userName
+    ) {
+        return new ResponseEntity<>(this.service.isUserTokenValid(jwtToken, userName), HttpStatus.OK);
     }
 }
