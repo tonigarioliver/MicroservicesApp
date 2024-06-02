@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
@@ -13,6 +15,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+
+import java.nio.charset.StandardCharsets;
 
 @RefreshScope
 @Component
@@ -28,35 +32,42 @@ public class AuthenticationFilter implements GatewayFilter {
 
         if (this.validator.isSecured.test(request)) {
             if (this.authMissing(request)) {
-                return this.onError(exchange, HttpStatus.UNAUTHORIZED);
+                return this.onError(exchange, HttpStatus.UNAUTHORIZED, "token missing");
             }
             //@Value("${services.userService.name}")
             final String USER_SERVICE_NAME = "USERSERVICE";
-            final String token = request.getHeaders().getOrEmpty("Authorization").get(0);
+            final String token = request.getHeaders().getOrEmpty("Authorization").get(0).substring(7);
+            ;
             final String userName = request.getHeaders().getOrEmpty("UserName").get(0);
             final String userServiceUrl = String.format(
                     "http://%s:%s",
                     this.clientsDiscoveryService.getHost(USER_SERVICE_NAME),
                     this.clientsDiscoveryService.getPort(USER_SERVICE_NAME)
             );
+
+            final String uri = String.format("%s/api/v1/user/isValid/%s/%s", userServiceUrl, token, userName);
             return this.webClient.get()
-                    .uri(String.format("%s/%s/%s", userServiceUrl, token, userName))
+                    .uri(uri)
                     .retrieve()
                     .bodyToMono(Boolean.class)
                     .flatMap(isValidToken -> {
-                        if (isValidToken) {
-                            return this.onError(exchange, HttpStatus.UNAUTHORIZED);
+                        if (!isValidToken) {
+                            return this.onError(exchange, HttpStatus.UNAUTHORIZED, "Token NOT valid");
                         }
                         return chain.filter(exchange);
-                    });
+                    })
+                    .onErrorResume(e -> this.onError(exchange, HttpStatus.UNAUTHORIZED, "token not valid"));
         }
         return chain.filter(exchange);
     }
 
-    private Mono<Void> onError(final ServerWebExchange exchange, final HttpStatus httpStatus) {
+    private Mono<Void> onError(final ServerWebExchange exchange, final HttpStatus status, final String errorMessage) {
         final ServerHttpResponse response = exchange.getResponse();
-        response.setStatusCode(httpStatus);
-        return response.setComplete();
+        response.setStatusCode(status);
+        final byte[] bytes = errorMessage.getBytes(StandardCharsets.UTF_8);
+        final DataBuffer buffer = new DefaultDataBufferFactory().wrap(bytes);
+        response.getHeaders().add("Content-Type", "application/json");
+        return response.writeWith(Mono.just(buffer));
     }
 
     private boolean authMissing(final ServerHttpRequest request) {

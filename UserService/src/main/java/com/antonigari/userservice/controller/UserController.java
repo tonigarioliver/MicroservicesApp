@@ -11,11 +11,11 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -49,11 +49,11 @@ public class UserController {
         return new ResponseEntity<>(this.service.registerUser(registerUserDto), HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping("/{jwtToken}/{userName}")
-    @Operation(summary = "Login User", description = "Login a user.")
+    @GetMapping("/isValid/{jwtToken}/{userName}")
+    @Operation(summary = "Is token valid", description = "Login a user.")
     public ResponseEntity<Boolean> isTokenValid(
-            @RequestParam @NotNull final String jwtToken,
-            @RequestParam @NotNull final String userName
+            @PathVariable("jwtToken") @NotNull final String jwtToken,
+            @PathVariable("userName") @NotNull final String userName
     ) {
         return new ResponseEntity<>(this.service.isUserTokenValid(jwtToken, userName), HttpStatus.OK);
     }
