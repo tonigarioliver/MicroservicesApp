@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @AllArgsConstructor
 public class GatewayConfig {
-    private AuthenticationFilter filter;
+    private final AuthenticationFilter filter;
 
     @Bean
     public RouteLocator routes(final RouteLocatorBuilder builder) {
