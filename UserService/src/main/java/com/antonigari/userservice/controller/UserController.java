@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
     private final IUserService service;
 
-    @PostMapping
+    @PostMapping("/register")
     @Operation(summary = "Register User", description = "Register a new User.")
     public ResponseEntity<LoginResponse> registerUser(
             @RequestBody @NotNull final RegisterUserDto registerUserDto
@@ -33,7 +33,7 @@ public class UserController {
         return new ResponseEntity<>(this.service.registerUser(registerUserDto), HttpStatus.CREATED);
     }
 
-    @GetMapping
+    @PostMapping("/login")
     @Operation(summary = "Login User", description = "Login a user.")
     public ResponseEntity<LoginResponse> loginUser(
             @RequestBody @NotNull final LoginUserDto loginUserDto

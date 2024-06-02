@@ -6,9 +6,6 @@ import lombok.Builder;
 @Builder
 public record LoginUserDto(
         @NotEmpty String userName,
-        @NotEmpty String email,
-        @NotEmpty String password,
-        @NotEmpty String name,
-        @NotEmpty String lastName
+        @NotEmpty String password
 ) {
 }

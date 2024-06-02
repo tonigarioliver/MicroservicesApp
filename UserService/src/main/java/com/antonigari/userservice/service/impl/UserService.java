@@ -52,7 +52,7 @@ public class UserService implements IUserService {
                 .build());
 
         return LoginResponse.builder()
-                .token(this.jwtService.generateToken(newUser))
+                .jwtToken(this.jwtService.generateToken(newUser))
                 .expiresIn(this.jwtService.getExpirationTime())
                 .build();
     }
@@ -62,7 +62,7 @@ public class UserService implements IUserService {
         final AppUser user = this.repository.findByUsername(loginUserDto.userName())
                 .orElseThrow(() -> ServiceErrorCatalog.NOT_FOUND.exception("User not exist"));
         return LoginResponse.builder()
-                .token(this.jwtService.generateToken(user))
+                .jwtToken(this.jwtService.generateToken(user))
                 .expiresIn(this.jwtService.getExpirationTime())
                 .build();
     }
