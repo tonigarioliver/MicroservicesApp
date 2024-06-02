@@ -22,7 +22,7 @@ public class GatewayConfig {
                         .filters(f -> f.filter(this.filter).stripPrefix(1))
                         .uri("lb://IOTDEVICESERVICE"))
                 .route("real-time-data-service", r -> r.path("/realTimeDataService/**")
-                        .filters(f -> f.filter(this.filter).stripPrefix(1))
+                        .filters(f -> f.stripPrefix(1))
                         .uri("lb://REALTIMEDATASERVICE"))
                 .build();
     }
