@@ -22,7 +22,9 @@ import java.nio.charset.StandardCharsets;
 @Component
 @AllArgsConstructor
 public class AuthenticationFilter implements GatewayFilter {
-    private RouterValidatorService validator;
+
+    private final ServicesConfiguration servicesConfiguration;
+    private final RouterValidatorService validator;
     private final WebClient webClient;
     private final IClientsDiscoveryService clientsDiscoveryService;
 
@@ -34,18 +36,19 @@ public class AuthenticationFilter implements GatewayFilter {
             if (this.authMissing(request)) {
                 return this.onError(exchange, HttpStatus.UNAUTHORIZED, "token missing");
             }
-            //@Value("${services.userService.name}")
-            final String USER_SERVICE_NAME = "USERSERVICE";
-            final String token = request.getHeaders().getOrEmpty("Authorization").get(0).substring(7);
-            ;
-            final String userName = request.getHeaders().getOrEmpty("UserName").get(0);
             final String userServiceUrl = String.format(
                     "http://%s:%s",
-                    this.clientsDiscoveryService.getHost(USER_SERVICE_NAME),
-                    this.clientsDiscoveryService.getPort(USER_SERVICE_NAME)
+                    this.clientsDiscoveryService.getHost(this.servicesConfiguration.getUSER_SERVICE_NAME()),
+                    this.clientsDiscoveryService.getPort(this.servicesConfiguration.getUSER_SERVICE_NAME())
             );
 
-            final String uri = String.format("%s/api/v1/user/isValid/%s/%s", userServiceUrl, token, userName);
+            final String uri = String.format(
+                    "%s/api/v1/user/isValid/%s/%s",
+                    userServiceUrl,
+                    this.getAuthorizationToken(request),
+                    this.getUserName(request)
+            );
+
             return this.webClient.get()
                     .uri(uri)
                     .retrieve()
@@ -59,6 +62,14 @@ public class AuthenticationFilter implements GatewayFilter {
                     .onErrorResume(e -> this.onError(exchange, HttpStatus.UNAUTHORIZED, "token not valid"));
         }
         return chain.filter(exchange);
+    }
+
+    private String getUserName(final ServerHttpRequest request) {
+        return request.getHeaders().getOrEmpty("UserName").get(0);
+    }
+
+    private String getAuthorizationToken(final ServerHttpRequest request) {
+        return request.getHeaders().getOrEmpty("Authorization").get(0).substring(7);
     }
 
     private Mono<Void> onError(final ServerWebExchange exchange, final HttpStatus status, final String errorMessage) {
