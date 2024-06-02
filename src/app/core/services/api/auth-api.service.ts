@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { AuthResponse } from 'src/app/core/models/auth-response';
+import { Device } from 'src/app/core/models/device';
 import { LoginForm } from 'src/app/core/models/login-form';
 import { RegisterForm } from 'src/app/core/models/register-form';
 

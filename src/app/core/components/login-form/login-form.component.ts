@@ -12,6 +12,10 @@ import { ToastService } from 'src/app/core/services/toast.service';
 })
 export class LoginFormComponent implements OnInit {
   public loginForm: FormGroup;
+  loginData: LoginForm = {
+    userName: '',
+    password: ''
+  }
 
   constructor(
     private readonly authApiService: AuthApiService,
@@ -35,6 +39,7 @@ export class LoginFormComponent implements OnInit {
   onSubmit(): void {
     if (this.loginForm?.valid) {
       const formValue: LoginForm = this.loginForm.value;
+      this.loginData = formValue
       this.authApiService.loginUser(formValue).subscribe(
         response => {
           this.doLoginLogic(response);
@@ -47,7 +52,9 @@ export class LoginFormComponent implements OnInit {
   }
 
   private doLoginLogic(response: AuthResponse): void {
+    console.log(response)
     const token = response.jwtToken;
     localStorage.setItem('jwtToken', token);
+    localStorage.setItem('UserName', this.loginData.userName)
   }
 }

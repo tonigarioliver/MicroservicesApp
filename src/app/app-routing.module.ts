@@ -8,7 +8,7 @@ const routes: Routes = [
   },
   {
     path: 'login',
-    loadChildren: () => import('./core/pages/login-form/login-form.module').then(m => m.LoginFormModule)
+    loadChildren: () => import('./core/components/login-form/login-form.module').then(m => m.LoginFormModule)
   }
 ];
 

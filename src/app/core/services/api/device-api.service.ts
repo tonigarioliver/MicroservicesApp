@@ -8,7 +8,6 @@ import { DeviceRequest } from 'src/app/core/models/device-request';
   providedIn: 'root'
 })
 export class DeviceApiService {
-
   private serviceUrl = 'http://localhost:8080/iotDeviceService/api/v1/devices'; // Replace with your API URL
 
   constructor(private http: HttpClient) { }
@@ -35,4 +34,5 @@ export class DeviceApiService {
     const url = `${this.serviceUrl}/${deviceId}`
     return this.http.delete<void>(url)
   }
+
 }

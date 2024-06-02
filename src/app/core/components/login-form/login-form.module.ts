@@ -5,8 +5,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatCardModule } from '@angular/material/card';
-import { LoginFormComponent } from 'src/app/core/pages/login-form/login-form.component';
-import { LoginFormRoutingModule } from 'src/app/core/pages/login-form/login-form-routing.module';
+import { LoginFormComponent } from 'src/app/core/components/login-form/login-form.component';
+import { LoginFormRoutingModule } from 'src/app/core/components/login-form/login-form-routing.module';
 
 
 @NgModule({
