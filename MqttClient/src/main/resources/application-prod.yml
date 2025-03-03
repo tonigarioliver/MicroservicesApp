@@ -2,13 +2,10 @@ mqtt:
   server:
     ip: tcp://mqtt5
     port: 1883
-  qos: 1
+
 spring:
   kafka:
     bootstrap-servers: kafka:9092
-    consumer:
-      group-id: iot-mqtt-client-service
-      topics: "CREATE_DEVICE_MEASUREMENT,UPDATE_DEVICE_MEASUREMENT,DELETE_DEVICE_MEASUREMENT"
 
 eureka:
   client:

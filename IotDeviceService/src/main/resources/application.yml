@@ -3,5 +3,20 @@ spring:
     active: dev
   application:
     name: IotDeviceService
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  kafka:
+    consumer:
+      group-id: iot-info-service
+      topics: "new-measure-payload,update-measure-payload,delete-measure-payload,"
+
 server:
   port: 8001

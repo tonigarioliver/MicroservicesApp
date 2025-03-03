@@ -3,13 +3,6 @@ spring:
     url: jdbc:postgresql://localhost:5435/microservices
     username: admin
     password: postgres
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-    defer-datasource-initialization: true
-    hibernate:
-      ddl-auto: update
-    show-sql: true
 
 eureka:
   client:
@@ -17,7 +10,3 @@ eureka:
       defaultZone: http://localhost:8761/eureka/
   instance:
     prefer-ip-address: true
-
-grpc:
-  server:
-    port: 9090

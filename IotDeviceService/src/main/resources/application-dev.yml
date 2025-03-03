@@ -3,24 +3,13 @@ spring:
     url: jdbc:postgresql://localhost:5435/microservices
     username: admin
     password: postgres
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-    defer-datasource-initialization: true
-    hibernate:
-      ddl-auto: update
-    show-sql: true
+
   kafka:
     bootstrap-servers: localhost:29092
-    consumer:
-      group-id: iot-info-service
-      topics: "new-measure-payload,update-measure-payload,delete-measure-payload,"
+
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
   instance:
-    hostname: localhost
     prefer-ip-address: true
-    ip-address: 127.0.0.1
-    use-ip-address: false

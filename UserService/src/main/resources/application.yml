@@ -3,6 +3,15 @@ spring:
     active: dev
   application:
     name: UserService
+  datasource:
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
 server:
   port: 8008
 

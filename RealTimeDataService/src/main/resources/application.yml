@@ -3,6 +3,11 @@ spring:
     active: dev
   application:
     name: RealTimeDataService
+  kafka:
+    consumer:
+      group-id: iot-info-service
+      topics: "CREATE_DEVICE_MEASUREMENT,UPDATE_DEVICE_MEASUREMENT,DELETE_DEVICE_MEASUREMENT"
+
 server:
   port: 8005
 management:
@@ -16,4 +21,5 @@ grpc:
   service:
     name: GRPCSERVERSERVICE
 
-
+mqtt:
+  qos: 1
