@@ -1,17 +1,26 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { MatDatepickerInputEvent } from '@angular/material/datepicker';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
+import { MatDatepickerInputEvent, MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from '@angular/material/datepicker';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialogTitle, MatDialogContent, MatDialogActions } from '@angular/material/dialog';
 import { DeviceModel } from 'src/app/core/models/device-model';
 import { DeviceRequest } from 'src/app/core/models/device-request';
 import { DeviceApiService } from 'src/app/core/services/api/device-api.service';
 import { DeviceModelApiService } from 'src/app/core/services/api/device-model-api.service';
 import { ToastService } from 'src/app/core/services/toast.service';
+import { NgIf, NgFor } from '@angular/common';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { MatFormField, MatLabel, MatSuffix } from '@angular/material/form-field';
+import { MatSelect } from '@angular/material/select';
+import { MatOption } from '@angular/material/core';
+import { MatInput } from '@angular/material/input';
+import { MatButton } from '@angular/material/button';
 
 @Component({
-  selector: 'app-device-form',
-  templateUrl: './device-form.component.html',
-  styleUrls: ['./device-form.component.css']
+    selector: 'app-device-form',
+    templateUrl: './device-form.component.html',
+    styleUrls: ['./device-form.component.css'],
+    standalone: true,
+    imports: [NgIf, MatDialogTitle, CdkScrollable, MatDialogContent, ReactiveFormsModule, MatFormField, MatLabel, MatSelect, NgFor, MatOption, MatInput, MatDatepickerInput, MatDatepickerToggle, MatSuffix, MatDatepicker, MatDialogActions, MatButton]
 })
 export class DeviceFormComponent implements OnInit {
 

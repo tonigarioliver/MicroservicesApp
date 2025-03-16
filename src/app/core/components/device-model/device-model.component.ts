@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
+import { MatTableDataSource, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { DeviceModel } from 'src/app/core/models/device-model';
@@ -8,11 +8,30 @@ import { MatDialog } from '@angular/material/dialog';
 import { DeviceModelFormComponent } from 'src/app/core/components/device-model-form/device-model-form.component';
 import { DeviceModelRequest } from 'src/app/core/models/device-model-request';
 import { ToastService } from 'src/app/core/services/toast.service';
+import { MatIconButton, MatFabButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
-  selector: 'app-device-model',
-  templateUrl: './device-model.component.html',
-  styleUrls: ['./device-model.component.scss'],
+    selector: 'app-device-model',
+    templateUrl: './device-model.component.html',
+    styleUrls: ['./device-model.component.scss'],
+    standalone: true,
+    imports: [
+        MatTable,
+        MatColumnDef,
+        MatHeaderCellDef,
+        MatHeaderCell,
+        MatCellDef,
+        MatCell,
+        MatIconButton,
+        MatIcon,
+        MatHeaderRowDef,
+        MatHeaderRow,
+        MatRowDef,
+        MatRow,
+        MatPaginator,
+        MatFabButton,
+    ],
 })
 export class DeviceModelComponent implements OnInit {
   displayedColumns: string[] = ['modelName', 'serialNumber', 'actions'];

@@ -6,11 +6,17 @@ import { DeviceMeasurementDetails } from 'src/app/core/models/device-measurement
 import { DeviceApiService } from 'src/app/core/services/api/device-api.service';
 import { DeviceMeasurementApiService } from 'src/app/core/services/api/device-measurement-api.service';
 import { ToastService } from 'src/app/core/services/toast.service';
+import { MatToolbar } from '@angular/material/toolbar';
+import { MatIconButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { SidenavDashboardComponent as SidenavDashboardComponent_1 } from '../../components/sidenav-dashboard/sidenav-dashboard.component';
 
 @Component({
-  selector: 'app-dashboard',
-  templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.css']
+    selector: 'app-dashboard',
+    templateUrl: './dashboard.component.html',
+    styleUrls: ['./dashboard.component.css'],
+    standalone: true,
+    imports: [MatToolbar, MatIconButton, MatIcon, SidenavDashboardComponent_1]
 })
 export class DashboardComponent implements OnInit {
   devices: Device[] = [];
