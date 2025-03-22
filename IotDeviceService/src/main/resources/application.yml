@@ -18,5 +18,12 @@ spring:
       group-id: iot-info-service
       topics: "new-measure-payload,update-measure-payload,delete-measure-payload,"
 
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health"
+
 server:
   port: 8001

@@ -10,3 +10,8 @@ spring:
   application:
     name: EurekaServer
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health"

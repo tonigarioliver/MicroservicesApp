@@ -18,6 +18,11 @@ spring:
           enabled: true
           lower-case-service-id: true
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health"
 
 api-gateway:
   routes:

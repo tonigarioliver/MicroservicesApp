@@ -24,11 +24,10 @@ public class WebSecurityConfiguration {
     public SecurityFilterChain configure(final HttpSecurity http) throws Exception {// Builds and returns the SecurityFilterChain.
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/user/**").permitAll()
-                        .requestMatchers("/**").permitAll()
+                        .requestMatchers("/api/v1/user/**", "/actuator/**").permitAll()
                 )
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(this.authenticationProvider)
                 .addFilterBefore(this.jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
