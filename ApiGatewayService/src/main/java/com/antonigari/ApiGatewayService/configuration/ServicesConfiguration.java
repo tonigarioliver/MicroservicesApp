@@ -8,5 +8,5 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 public class ServicesConfiguration {
     @Value("${services.userService.name}")
-    private String USER_SERVICE_NAME;
+    private String userServiceName;
 }

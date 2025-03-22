@@ -49,7 +49,6 @@ public class MqttClientService {
         try {
             this.mqttCustomClient.getMqttClient().connect(this.mqttClientConfig.mqttConnectionOptions());
             future.complete(null);
-            this.listener = new MqttMessageHandler(this.mqttCustomClient, this.webSocketClientManager);
             this.mqttCustomClient.getMqttClient().setCallback(this.listener);
             this.measurements.clear();
             this.measurementGrpcService.getAllDeviceMeasurement().forEach(this::addSubscription);
@@ -83,7 +82,6 @@ public class MqttClientService {
     }
 
     public synchronized void updateSubscription(final DeviceMeasurementDto measure) {
-        // Search for the topic with the same serialNumber
         final DeviceMeasurementDto existingMeasure = this.measurements.stream()
                 .filter(topic -> topic.deviceMeasurementId().equals(measure.deviceMeasurementId()))
                 .findFirst()

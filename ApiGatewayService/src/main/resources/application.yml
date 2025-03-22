@@ -18,6 +18,24 @@ spring:
           enabled: true
           lower-case-service-id: true
 
+
+api-gateway:
+  routes:
+    - id: user-service
+      path: /auth/**
+      uri: lb://USERSERVICE
+      applyJwtFilter: true
+    - id: iot-device-service
+      path: /iotDeviceService/**
+      uri: lb://IOTDEVICESERVICE
+      applyJwtFilter: true
+    - id: real-time-data-service
+      path: /realTimeDataService/**
+      uri: lb://REALTIMEDATASERVICE
+      applyJwtFilter: false
+
+
+
 services:
   userService:
     name: USERSERVICE
