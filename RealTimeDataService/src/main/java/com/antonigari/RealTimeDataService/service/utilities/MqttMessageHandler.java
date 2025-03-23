@@ -1,6 +1,6 @@
 package com.antonigari.RealTimeDataService.service.utilities;
 
-import com.antonigari.RealTimeDataService.config.mqtt.MqttCustomClient;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.mqttv5.client.IMqttToken;
 import org.eclipse.paho.mqttv5.client.MqttDisconnectResponse;
@@ -9,6 +9,7 @@ import org.eclipse.paho.mqttv5.common.MqttMessage;
 import org.eclipse.paho.mqttv5.common.packet.MqttProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -16,14 +17,9 @@ import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @Component
+@AllArgsConstructor
 public class MqttMessageHandler implements org.eclipse.paho.mqttv5.client.MqttCallback {
-    private final MqttCustomClient mqttCustomClient;
     private final WebSocketClientManager webSocketClientManager;
-
-    public MqttMessageHandler(final MqttCustomClient mqttCustomClient, final WebSocketClientManager webSocketClientManager) {
-        this.mqttCustomClient = mqttCustomClient;
-        this.webSocketClientManager = webSocketClientManager;
-    }
 
     @Override
     public void disconnected(final MqttDisconnectResponse mqttDisconnectResponse) {
@@ -42,16 +38,16 @@ public class MqttMessageHandler implements org.eclipse.paho.mqttv5.client.MqttCa
 
     private void sendToSubscribers(final String topic, final String messagePayload) {
         this.webSocketClientManager.getAllSessionsByTopic(topic)
-                .forEach(webSocketSession -> {
-                            try {
-                                webSocketSession
-                                        .sendMessage(new TextMessage(messagePayload));
-                            } catch (final IOException e) {
-                                log.error(String.format("Error Websocket with reason %s", e.getMessage()));
-                            }
-                        }
-                );
+                .forEach(webSocketSession -> sendMessageToListener(messagePayload, webSocketSession));
 
+    }
+
+    private void sendMessageToListener(final String messagePayload, final WebSocketSession webSocketSession) {
+        try {
+            webSocketSession.sendMessage(new TextMessage(messagePayload));
+        } catch (final IOException e) {
+            log.error(String.format("Error Websocket with reason %s", e.getMessage()));
+        }
     }
 
     @Override

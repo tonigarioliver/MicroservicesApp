@@ -3,18 +3,10 @@ spring:
     url: jdbc:postgresql://postgres_db:5432/microservices
     username: admin
     password: postgres
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-    defer-datasource-initialization: true
-    hibernate:
-      ddl-auto: update
-    show-sql: true
+
   kafka:
     bootstrap-servers: kafka:9092
-    consumer:
-      group-id: iot-info-service
-      topics: "new-measure-payload,update-measure-payload,delete-measure-payload,"
+
 eureka:
   client:
     service-url:

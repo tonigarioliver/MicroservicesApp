@@ -1,5 +1,6 @@
 package com.antonigari.RealTimeDataService.service.Impl;
 
+import com.antonigari.RealTimeDataService.DeviceMeasurementGrpc;
 import com.antonigari.RealTimeDataService.DeviceMeasurementGrpcServiceGrpc;
 import com.antonigari.RealTimeDataService.GetAllDeviceMeasurementRequest;
 import com.antonigari.RealTimeDataService.GetAllDeviceMeasurementResponse;
@@ -25,33 +26,32 @@ public class DeviceMeasurementGrpcService {
                 .getAllDeviceMeasurement(GetAllDeviceMeasurementRequest.newBuilder().build());
         log.info(response.toString());
         return response.getDeviceMeasurementList().stream()
-                .map(meassure -> DeviceMeasurementDto.builder()
-                        .deviceMeasurementId(meassure.getDeviceMeasurementId())
-                        .topic(meassure.getTopic())
-                        .device(DeviceDto.builder()
-                                .deviceId(meassure.getDevice().getDeviceId())
-                                .manufactureCode(meassure.getDevice().getManufactureCode())
-                                .build())
-                        .measurementType(MeasurementTypeDto.builder()
-                                .measurementTypeId(meassure.getMeasurementType().getMeasurementTypeId())
-                                .typeName(this.getGrpcMeasurementTypeName(meassure.getMeasurementType().getTypeName()))
-                                .build())
-                        .build())
+                .map(this::buildDevieceMeasurementDto)
                 .toList();
     }
 
+    private DeviceMeasurementDto buildDevieceMeasurementDto(final DeviceMeasurementGrpc meassure) {
+        return DeviceMeasurementDto.builder()
+                .deviceMeasurementId(meassure.getDeviceMeasurementId())
+                .topic(meassure.getTopic())
+                .device(DeviceDto.builder()
+                        .deviceId(meassure.getDevice().getDeviceId())
+                        .manufactureCode(meassure.getDevice().getManufactureCode())
+                        .build())
+                .measurementType(MeasurementTypeDto.builder()
+                        .measurementTypeId(meassure.getMeasurementType().getMeasurementTypeId())
+                        .typeName(this.getGrpcMeasurementTypeName(meassure.getMeasurementType().getTypeName()))
+                        .build())
+                .build();
+    }
+
     private MeasurementTypeName getGrpcMeasurementTypeName(final MeasurementTypeNameGrpc type) {
-        switch (type) {
-            case STRING -> {
-                return MeasurementTypeName.STRING;
-            }
-            case BOOLEAN -> {
-                return MeasurementTypeName.BOOLEAN;
-            }
-            case NUMERIC -> {
-                return MeasurementTypeName.NUMERIC;
-            }
-        }
-        throw new UnsupportedOperationException("type name is not implemented yet");
+        return switch (type) {
+            case STRING -> MeasurementTypeName.STRING;
+            case BOOLEAN ->MeasurementTypeName.BOOLEAN;
+            case NUMERIC -> MeasurementTypeName.NUMERIC;
+            case UNRECOGNIZED ->  throw new UnsupportedOperationException("type name is not implemented yet");
+        };
+
     }
 }

@@ -1,9 +1,6 @@
 spring:
   kafka:
     bootstrap-servers: kafka:9092
-    consumer:
-      group-id: iot-info-service
-      topics: "CREATE_DEVICE_MEASUREMENT,UPDATE_DEVICE_MEASUREMENT,DELETE_DEVICE_MEASUREMENT"
 
 eureka:
   client:
@@ -11,8 +8,8 @@ eureka:
       defaultZone: http://eurekaserver:8761/eureka/
   instance:
     prefer-ip-address: true
+
 mqtt:
   server:
     ip: tcp://mqtt5
     port: 1883
-  qos: 1

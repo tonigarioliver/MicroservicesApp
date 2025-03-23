@@ -44,14 +44,7 @@ public class WebSocketClientManager {
         });
     }
 
-
     public void removeWebSocketClient(final WebSocketSession session) {
         this.webSocketClients.values().forEach(sessions -> sessions.removeIf(session::equals));
-    }
-
-    public List<String> getKeysWithEmptyLists() {
-        return this.webSocketClients.keySet().stream()
-                .filter(key -> this.webSocketClients.get(key).isEmpty())
-                .toList();
     }
 }

@@ -18,8 +18,8 @@ public class EurekaClientDiscoveryServiceI implements IClientsDiscoveryService {
     public String getServiceUrl(final String serviceName) {
         final List<ServiceInstance> instances = this.discoveryClient.getInstances(serviceName);
         if (instances != null && !instances.isEmpty()) {
-            instances.get(0).getUri();
-            return instances.get(0).getUri().toString();
+            instances.getFirst().getUri();
+            return instances.getFirst().getUri().toString();
         }
         return null;
     }
@@ -28,7 +28,7 @@ public class EurekaClientDiscoveryServiceI implements IClientsDiscoveryService {
     public String getHost(final String serviceName) {
         final List<ServiceInstance> instances = this.discoveryClient.getInstances(serviceName);
         if (instances != null && !instances.isEmpty()) {
-            return instances.get(0).getHost();
+            return instances.getFirst().getHost();
         }
         return null;
     }
@@ -37,7 +37,7 @@ public class EurekaClientDiscoveryServiceI implements IClientsDiscoveryService {
     public Integer getPort(final String serviceName) {
         final List<ServiceInstance> instances = this.discoveryClient.getInstances(serviceName);
         if (instances != null && !instances.isEmpty()) {
-            return instances.get(0).getPort();
+            return instances.getFirst().getPort();
         }
         return null;
     }

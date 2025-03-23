@@ -27,8 +27,7 @@ public class UserService implements IUserService {
 
     @Override
     public UserDetails loadUserByUsername(final String userName) throws UsernameNotFoundException {
-        final AppUser user = this.repository.findByUsername(userName)
-                .orElseThrow(() -> ServiceErrorCatalog.NOT_FOUND.exception("User not exist"));
+        final AppUser user = this.getUserDetails(userName);
         return User.withUsername(user.getUsername())
                 .password(user.getPassword())
                 .authorities("ROLE_USER")
@@ -59,10 +58,8 @@ public class UserService implements IUserService {
 
     @Override
     public LoginResponse loginUser(final LoginUserDto loginUserDto) {
-        final AppUser user = this.repository.findByUsername(loginUserDto.userName())
-                .orElseThrow(() -> ServiceErrorCatalog.NOT_FOUND.exception("User not exist"));
         return LoginResponse.builder()
-                .jwtToken(this.jwtService.generateToken(user))
+                .jwtToken(this.jwtService.generateToken(this.getUserDetails(loginUserDto.userName())))
                 .expiresIn(this.jwtService.getExpirationTime())
                 .build();
     }
@@ -75,5 +72,10 @@ public class UserService implements IUserService {
     @Override
     public String getUserNameFromToken(final String jwtToken) {
         return this.jwtService.extractUsername(jwtToken);
+    }
+
+    private AppUser getUserDetails(String userName) {
+        return this.repository.findByUsername(userName)
+                .orElseThrow(() -> ServiceErrorCatalog.NOT_FOUND.exception("User not exist"));
     }
 }

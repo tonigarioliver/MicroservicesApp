@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   # mqtt5 eclipse-mosquitto
   mqtt5:
@@ -24,7 +22,7 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
     ports:
-      - 2181:2181
+      - "2181:2181"
     networks:
       - my-network
 
@@ -34,7 +32,7 @@ services:
     depends_on:
       - zookeeper
     ports:
-      - 29092:29092
+      - "29092:29092"
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
@@ -64,7 +62,6 @@ services:
 
   eurekaserver:
     container_name: eurekaserver
-    restart: always
     depends_on:
       - mqtt5
       - kafka
@@ -74,39 +71,99 @@ services:
     build: ./EurekaServer
     networks:
       - my-network
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8761/actuator/health" ]
+      interval: 10s
+      retries: 15
+      start_period: 20s
+      timeout: 5s
 
   user-service:
     container_name: user-service
-    restart: always
     depends_on:
-      - eurekaserver
+      eurekaserver:
+        condition: service_healthy
     ports:
       - "8008:8008"
     build: ./UserService
     networks:
       - my-network
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8008/actuator/health" ]
+      interval: 10s
+      retries: 15
+      start_period: 20s
+      timeout: 5s
+
+  grpcserverservice:
+    container_name: grpcserverservice
+    depends_on:
+      user-service:
+        condition: service_healthy
+    ports:
+      - "9090:9090"
+    build: ./GrpcServerService
+    networks:
+      - my-network
+    restart: unless-stopped
+
+  iotdeviceservice:
+    container_name: iotdeviceservice
+    build: ./IotDeviceService
+    ports:
+      - "8001:8001"
+    depends_on:
+      user-service:
+        condition: service_healthy
+    networks:
+      - my-network
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8001/actuator/health" ]
+      interval: 20s
+      retries: 20
+      start_period: 120s
+      timeout: 10s
+
+  mqtt_client_service:
+    container_name: mqtt_client_service
+    restart: unless-stopped
+    depends_on:
+      iotdeviceservice:
+        condition: service_healthy
+    build: ./MqttClient
+    networks:
+      - my-network
+
+  real_time_data_service:
+    container_name: real_time_service
+    ports:
+      - "8005:8005"
+    depends_on:
+      iotdeviceservice:
+        condition: service_healthy
+    build: ./RealTimeDataService
+    networks:
+      - my-network
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8005/actuator/health" ]
+      interval: 10s
+      retries: 15
+      start_period: 20s
+      timeout: 5s
 
   api-gateway-service:
     container_name: api-gateway-service
     restart: always
     depends_on:
-      - real_time_data_service
+      real_time_data_service:
+        condition: service_healthy
     ports:
       - "8080:8080"
     build: ./ApiGatewayService
-    networks:
-      - my-network
-
-  
-  grpcserverservice:
-    container_name: grpcserverservice
-    restart: always
-    depends_on:
-      - eurekaserver
-      - user-service
-    ports:
-      - "9090:9090"
-    build: ./GrpcServerService
     networks:
       - my-network
 
@@ -125,41 +182,6 @@ services:
       - pgadmin-data:/var/lib/pgadmin
     networks:
       - my-network
-
-  iotdeviceservice:
-    container_name: iotdeviceservice
-    build: ./IotDeviceService
-    restart: always
-    ports:
-      - "8001:8001"
-    depends_on:
-      - eurekaserver
-    networks:
-      - my-network
-
-  mqtt_client_service:
-    container_name: mqtt_client_service
-    restart: always
-    depends_on:
-      - eurekaserver
-      - grpcserverservice
-    build: ./MqttClient
-    networks:
-      - my-network
-
-  real_time_data_service:
-    container_name: real_time_service
-    restart: always
-    ports:
-      - "8005:8005"
-    depends_on:
-      - eurekaserver
-      - grpcserverservice
-      - mqtt_client_service
-    build: ./RealTimeDataService
-    networks:
-      - my-network
-
 
 networks:
   my-network:

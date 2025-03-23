@@ -25,35 +25,28 @@ public class KafkaConsumerService implements IKafkaConsumerService {
             .addModule(new Jdk8Module())
             .addModule(new JavaTimeModule())
             .build();
-    ;
 
     @Override
     @KafkaListener(topics = "#{'${spring.kafka.consumer.topics}'.split(',')}", groupId = "${spring.kafka.consumer.group-id}")
     public void listen(final String payload, @Header("kafka_receivedTopic") final String topic) {
         log.info(payload);
-        final DeviceMeasurementDto measure;
         try {
-            measure = this.objectMapper.readValue(payload, DeviceMeasurementDto.class);
-            this.processMessage(topic, measure);
+            this.handleIncomingMessageWithMqttClient(topic, this.objectMapper.readValue(payload, DeviceMeasurementDto.class));
         } catch (final JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void processMessage(final String topic, final DeviceMeasurementDto measure) {
+    private void handleIncomingMessageWithMqttClient(final String topic, final DeviceMeasurementDto measure) {
         switch (topic) {
-            case "CREATE_DEVICE_MEASUREMENT":
-                this.mqttClientService.addSubscription(measure);
-                break;
-            case "UPDATE_DEVICE_MEASUREMENT":
-                this.mqttClientService.updateSubscription(measure);
-                break;
-            case "DELETE_DEVICE_MEASUREMENT":
-                this.mqttClientService.removeSubscription(measure);
-                break;
-            default:
-                log.warn("Received message for unknown topic {}: {}", topic, measure);
-                break;
+            case "CREATE_DEVICE_MEASUREMENT"->this.mqttClientService.addSubscription(measure);
+
+            case "UPDATE_DEVICE_MEASUREMENT"->this.mqttClientService.updateSubscription(measure);
+
+            case "DELETE_DEVICE_MEASUREMENT"->this.mqttClientService.removeSubscription(measure);
+
+            default-> log.warn("Received message for unknown topic {}: {}", topic, measure);
+
         }
     }
 

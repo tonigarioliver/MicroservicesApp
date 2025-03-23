@@ -36,40 +36,45 @@ public class AuthenticationFilter implements GatewayFilter {
             if (this.authMissing(request)) {
                 return this.onError(exchange, HttpStatus.UNAUTHORIZED, "token missing");
             }
-            final String userServiceUrl = String.format(
-                    "http://%s:%s",
-                    this.clientsDiscoveryService.getHost(this.servicesConfiguration.getUSER_SERVICE_NAME()),
-                    this.clientsDiscoveryService.getPort(this.servicesConfiguration.getUSER_SERVICE_NAME())
-            );
-
-            final String uri = String.format(
-                    "%s/api/v1/user/isValid/%s/%s",
-                    userServiceUrl,
-                    this.getAuthorizationToken(request),
-                    this.getUserName(request)
-            );
-
             return this.webClient.get()
-                    .uri(uri)
+                    .uri(this.buildValidationAuthUri(request))
                     .retrieve()
                     .bodyToMono(Boolean.class)
-                    .flatMap(isValidToken -> {
-                        if (!isValidToken) {
-                            return this.onError(exchange, HttpStatus.UNAUTHORIZED, "Token NOT valid");
-                        }
-                        return chain.filter(exchange);
-                    })
+                    .flatMap(isValidToken -> checkAuthResponse(exchange, chain, isValidToken))
                     .onErrorResume(e -> this.onError(exchange, HttpStatus.UNAUTHORIZED, "token not valid"));
         }
         return chain.filter(exchange);
     }
 
+    private Mono<Void> checkAuthResponse(ServerWebExchange exchange, GatewayFilterChain chain, Boolean isValidToken) {
+        return Boolean.TRUE.equals(isValidToken)
+                ? chain.filter(exchange)
+                :this.onError(exchange, HttpStatus.UNAUTHORIZED, "Token NOT valid") ;
+    }
+
+    private String buildValidationAuthUri(ServerHttpRequest request) {
+        return String.format(
+                "%s/api/v1/user/isValid/%s/%s",
+                this.getAuthServiceUrl(),
+                this.getAuthorizationToken(request),
+                this.getUserName(request)
+        );
+    }
+
+    private String getAuthServiceUrl() {
+        return String.format(
+                "http://%s:%s",
+                this.clientsDiscoveryService.getHost(this.servicesConfiguration.getUserServiceName()),
+                this.clientsDiscoveryService.getPort(this.servicesConfiguration.getUserServiceName())
+        );
+    }
+
     private String getUserName(final ServerHttpRequest request) {
-        return request.getHeaders().getOrEmpty("UserName").get(0);
+        return request.getHeaders().getOrEmpty("UserName").getFirst();
     }
 
     private String getAuthorizationToken(final ServerHttpRequest request) {
-        return request.getHeaders().getOrEmpty("Authorization").get(0).substring(7);
+        return request.getHeaders().getOrEmpty("Authorization").getFirst().substring(7);
     }
 
     private Mono<Void> onError(final ServerWebExchange exchange, final HttpStatus status, final String errorMessage) {
