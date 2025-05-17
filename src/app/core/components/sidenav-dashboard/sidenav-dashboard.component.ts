@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { MatCheckboxChange } from '@angular/material/checkbox';
+import { MatCheckboxChange, MatCheckbox } from '@angular/material/checkbox';
 import { DeviceMeasurementComponent } from 'src/app/core/components/device-measurement/device-measurement.component';
 import { DeviceModelComponent } from 'src/app/core/components/device-model/device-model.component';
 import { DeviceComponent } from 'src/app/core/components/device/device.component';
@@ -9,6 +9,10 @@ import { RealTimeWebSocketRequest } from 'src/app/core/models/real-time-iot-mess
 import { DeviceMeasurementApiService } from 'src/app/core/services/api/device-measurement-api.service';
 import { ToastService } from 'src/app/core/services/toast.service';
 import { RealTimeIotService } from 'src/app/core/services/websocket/real-time-iot.service';
+import { MatDrawerContainer, MatDrawer, MatDrawerContent } from '@angular/material/sidenav';
+import { MatNavList, MatListItem } from '@angular/material/list';
+import { MatButton } from '@angular/material/button';
+import { NgFor, NgIf, NgComponentOutlet } from '@angular/common';
 interface ComponentToShow {
   name: string;
   component: any; // Type of the component
@@ -16,9 +20,11 @@ interface ComponentToShow {
 }
 
 @Component({
-  selector: 'app-sidenav-dashboard',
-  templateUrl: './sidenav-dashboard.component.html',
-  styleUrls: ['./sidenav-dashboard.component.scss']
+    selector: 'app-sidenav-dashboard',
+    templateUrl: './sidenav-dashboard.component.html',
+    styleUrls: ['./sidenav-dashboard.component.scss'],
+    standalone: true,
+    imports: [MatDrawerContainer, MatDrawer, MatNavList, MatListItem, MatButton, MatDrawerContent, NgFor, MatCheckbox, NgIf, NgComponentOutlet]
 })
 export class SidenavDashboardComponent implements OnInit, OnDestroy {
   componentsToShow: ComponentToShow[] = [

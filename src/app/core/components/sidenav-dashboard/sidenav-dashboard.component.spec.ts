@@ -8,8 +8,8 @@ describe('SidenavDashboardComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [SidenavDashboardComponent]
-    });
+    imports: [SidenavDashboardComponent]
+});
     fixture = TestBed.createComponent(SidenavDashboardComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

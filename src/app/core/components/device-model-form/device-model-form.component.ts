@@ -1,13 +1,20 @@
 import { Component, Inject } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { MAT_DIALOG_DATA, MatDialogRef, MatDialogTitle, MatDialogContent, MatDialogActions } from '@angular/material/dialog';
 import { DeviceModelRequest } from 'src/app/core/models/device-model-request';
 import { DeviceModelApiService } from 'src/app/core/services/api/device-model-api.service';
+import { NgIf } from '@angular/common';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
+import { MatButton } from '@angular/material/button';
 
 @Component({
-  selector: 'app-create-device-model',
-  templateUrl: './device-model-form.component.html',
-  styleUrls: ['./device-model-form.component.css']
+    selector: 'app-create-device-model',
+    templateUrl: './device-model-form.component.html',
+    styleUrls: ['./device-model-form.component.css'],
+    standalone: true,
+    imports: [NgIf, MatDialogTitle, CdkScrollable, MatDialogContent, ReactiveFormsModule, MatFormField, MatLabel, MatInput, MatDialogActions, MatButton]
 })
 export class DeviceModelFormComponent {
   deviceModelRequest: DeviceModelRequest = {
