@@ -19,39 +19,52 @@ import java.util.List;
 @AllArgsConstructor
 @Slf4j
 public class DeviceMeasurementGrpcService {
-    private final DeviceMeasurementGrpcServiceGrpc.DeviceMeasurementGrpcServiceBlockingStub deviceMeasurementGrpcServiceBlockingStub;
 
+    private final DeviceMeasurementGrpcServiceGrpc.DeviceMeasurementGrpcServiceBlockingStub measurementStub;
+
+    /**
+     * Retrieves all device measurements from the gRPC service.
+     *
+     * @return List of device measurements
+     */
     public List<DeviceMeasurementDto> getAllDeviceMeasurement() {
-        final GetAllDeviceMeasurementResponse response = this.deviceMeasurementGrpcServiceBlockingStub
+        final GetAllDeviceMeasurementResponse response = this.measurementStub
                 .getAllDeviceMeasurement(GetAllDeviceMeasurementRequest.newBuilder().build());
         log.info(response.toString());
         return response.getDeviceMeasurementList().stream()
-                .map(this::buildDevieceMeasurementDto)
+                .map(this::buildDeviceMeasurementDto)
                 .toList();
     }
 
-    private DeviceMeasurementDto buildDevieceMeasurementDto(final DeviceMeasurementGrpc meassure) {
+    private DeviceMeasurementDto buildDeviceMeasurementDto(final DeviceMeasurementGrpc measurement) {
         return DeviceMeasurementDto.builder()
-                .deviceMeasurementId(meassure.getDeviceMeasurementId())
-                .topic(meassure.getTopic())
-                .device(DeviceDto.builder()
-                        .deviceId(meassure.getDevice().getDeviceId())
-                        .manufactureCode(meassure.getDevice().getManufactureCode())
-                        .build())
-                .measurementType(MeasurementTypeDto.builder()
-                        .measurementTypeId(meassure.getMeasurementType().getMeasurementTypeId())
-                        .typeName(this.getGrpcMeasurementTypeName(meassure.getMeasurementType().getTypeName()))
-                        .build())
+                .deviceMeasurementId(measurement.getDeviceMeasurementId())
+                .topic(measurement.getTopic())
+                .device(this.buildDeviceDto(measurement))
+                .measurementType(this.buildMeasurementTypeDto(measurement))
                 .build();
     }
 
-    private MeasurementTypeName getGrpcMeasurementTypeName(final MeasurementTypeNameGrpc type) {
+    private DeviceDto buildDeviceDto(final DeviceMeasurementGrpc measurement) {
+        return DeviceDto.builder()
+                .deviceId(measurement.getDevice().getDeviceId())
+                .manufactureCode(measurement.getDevice().getManufactureCode())
+                .build();
+    }
+
+    private MeasurementTypeDto buildMeasurementTypeDto(final DeviceMeasurementGrpc measurement) {
+        return MeasurementTypeDto.builder()
+                .measurementTypeId(measurement.getMeasurementType().getMeasurementTypeId())
+                .typeName(this.convertMeasurementTypeName(measurement.getMeasurementType().getTypeName()))
+                .build();
+    }
+
+    private MeasurementTypeName convertMeasurementTypeName(final MeasurementTypeNameGrpc type) {
         return switch (type) {
             case STRING -> MeasurementTypeName.STRING;
-            case BOOLEAN ->MeasurementTypeName.BOOLEAN;
+            case BOOLEAN -> MeasurementTypeName.BOOLEAN;
             case NUMERIC -> MeasurementTypeName.NUMERIC;
-            case UNRECOGNIZED ->  throw new UnsupportedOperationException("type name is not implemented yet");
+            case UNRECOGNIZED -> throw new UnsupportedOperationException("Type name is not implemented yet");
         };
-
     }
 }

@@ -4,6 +4,7 @@ import com.antonigari.RealTimeDataService.config.mqtt.MqttClientConfig;
 import com.antonigari.RealTimeDataService.config.mqtt.MqttCustomClient;
 import com.antonigari.RealTimeDataService.model.DeviceMeasurementDto;
 import com.antonigari.RealTimeDataService.service.utilities.MqttMessageHandler;
+import com.antonigari.RealTimeDataService.service.utilities.MqttSubscriptionManager;
 import com.antonigari.RealTimeDataService.service.utilities.WebSocketClientManager;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,106 +14,100 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.WebSocketSession;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 @Service
 @Slf4j
 @AllArgsConstructor
 public class MqttClientService {
-
     private final MqttClientConfig mqttClientConfig;
     private final MqttCustomClient mqttCustomClient;
     private final DeviceMeasurementGrpcService measurementGrpcService;
-    private final Set<DeviceMeasurementDto> measurements = new HashSet<>();
-    private MqttMessageHandler listener;
+    private final MqttSubscriptionManager subscriptionManager;
     private final WebSocketClientManager webSocketClientManager;
-
+    private MqttMessageHandler messageHandler;
 
     @EventListener(ApplicationReadyEvent.class)
     public void initialize() {
-        try {
-            final CompletableFuture<Void> connectionFuture = this.mqttConnectAsync();
-            connectionFuture.thenAccept(result -> {
-            }).exceptionally(exception -> {
-                log.error("Error en la conexión MQTT: " + exception.getMessage(), exception);
-                return null;
-            });
-        } catch (final Exception e) {
-            log.error("Error en la inicialización: " + e.getMessage(), e);
-        }
+        this.establishMqttConnection()
+                .exceptionally(MqttClientService::handleConnectionError);
     }
 
-    public CompletableFuture<Void> mqttConnectAsync() {
-        final CompletableFuture<Void> future = new CompletableFuture<>();
-        try {
-            this.mqttCustomClient.getMqttClient().connect(this.mqttClientConfig.mqttConnectionOptions());
-            future.complete(null);
-            this.mqttCustomClient.getMqttClient().setCallback(this.listener);
-            this.measurements.clear();
-            this.measurementGrpcService.getAllDeviceMeasurement().forEach(this::addSubscription);
-            this.mqttCustomClient.setConnected(true);
-        } catch (final MqttException e) {
-            log.error("Error en la conexión MQTT: " + e.getMessage(), e);
-            future.completeExceptionally(e);
-        }
-        return future;
+    private CompletableFuture<Void> establishMqttConnection() {
+        return CompletableFuture.runAsync(() -> {
+            try {
+                this.connectMqttClient();
+                this.initializeSubscriptions();
+            } catch (final MqttException e) {
+                throw new CompletionException("Failed to establish MQTT connection", e);
+            }
+        });
+    }
+
+    private void connectMqttClient() throws MqttException {
+        this.mqttCustomClient.getMqttClient().connect(this.mqttClientConfig.mqttConnectionOptions());
+        this.mqttCustomClient.getMqttClient().setCallback(this.messageHandler);
+        this.mqttCustomClient.setConnected(true);
+    }
+
+    private void initializeSubscriptions() {
+        this.subscriptionManager.clearSubscriptions();
+        this.measurementGrpcService.getAllDeviceMeasurement()
+                .forEach(this::addSubscription);
     }
 
     public synchronized void addSubscription(final DeviceMeasurementDto measure) {
-        if (this.measurements.contains(measure)) {
-            log.warn("Topic already exists: " + measure);
+        if (!this.subscriptionManager.addMeasurement(measure)) {
             return;
         }
-        log.info("New topic added: " + measure);
-        this.measurements.add(measure);
         this.subscribeTopic(measure);
     }
 
     public synchronized void removeSubscription(final DeviceMeasurementDto measure) {
-        if (!this.measurements.contains(measure)) {
-            log.warn("Topic does not exist: " + measure);
+        if (!this.subscriptionManager.removeMeasurement(measure)) {
             return;
         }
-        log.info("Topic to remove: " + measure);
-        this.measurements.remove(measure);
         this.unsubscribeTopic(measure);
         this.webSocketClientManager.removeWebSocketClientsWhenTopicRemoved(measure.topic());
     }
 
     public synchronized void updateSubscription(final DeviceMeasurementDto measure) {
-        final DeviceMeasurementDto existingMeasure = this.measurements.stream()
-                .filter(topic -> topic.deviceMeasurementId().equals(measure.deviceMeasurementId()))
-                .findFirst()
-                .orElse(null);
-
+        final DeviceMeasurementDto existingMeasure = this.subscriptionManager.findMeasurementById(measure.deviceMeasurementId());
         if (existingMeasure == null) {
-            log.warn("Topic not found for update: " + measure);
+            log.warn("Cannot update subscription: Topic not found for measurement ID {}", measure.deviceMeasurementId());
             return;
         }
-        log.info("Topic updated: " + measure);
+
         this.unsubscribeTopic(existingMeasure);
         this.addSubscription(measure);
         this.webSocketClientManager.updateWebSocketClientWhenTopicUpdate(existingMeasure.topic(), measure.topic());
     }
 
-    private void unsubscribeTopic(final DeviceMeasurementDto measure) {
-        try {
-            this.mqttCustomClient.getMqttClient().unsubscribe(measure.topic());
-        } catch (final MqttException e) {
-            log.error(e.getMessage());
-        }
-    }
-
     private void subscribeTopic(final DeviceMeasurementDto measure) {
         try {
             this.mqttCustomClient.getMqttClient().subscribe(measure.topic(), 1);
+            log.info("Successfully subscribed to topic: {}", measure.topic());
         } catch (final MqttException e) {
-            log.error(e.getMessage());
+            log.error("Failed to subscribe to topic {}: {}", measure.topic(), e.getMessage());
         }
     }
 
+    private void unsubscribeTopic(final DeviceMeasurementDto measure) {
+        try {
+            this.mqttCustomClient.getMqttClient().unsubscribe(measure.topic());
+            log.info("Successfully unsubscribed from topic: {}", measure.topic());
+        } catch (final MqttException e) {
+            log.error("Failed to unsubscribe from topic {}: {}", measure.topic(), e.getMessage());
+        }
+    }
+
+    private static Void handleConnectionError(final Throwable exception) {
+        log.error("MQTT connection error: {}", exception.getMessage(), exception);
+        return null;
+    }
+
+    // WebSocket session management delegates
     public void addWebSocketClientTopic(final WebSocketSession session, final String topic) {
         this.webSocketClientManager.subscribe(session, topic);
     }

@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @AllArgsConstructor
 public class KafkaConsumerService implements IKafkaConsumerService {
+    private static final String UNKNOWN_TOPIC_MESSAGE = "Received message for unknown topic {}: {}";
+
     private final MqttClientService mqttClientService;
     private final ObjectMapper objectMapper = JsonMapper.builder()
             .addModule(new ParameterNamesModule())
@@ -27,27 +29,45 @@ public class KafkaConsumerService implements IKafkaConsumerService {
             .build();
 
     @Override
-    @KafkaListener(topics = "#{'${spring.kafka.consumer.topics}'.split(',')}", groupId = "${spring.kafka.consumer.group-id}")
+    @KafkaListener(
+            topics = "#{'${spring.kafka.consumer.topics}'.split(',')}",
+            groupId = "${spring.kafka.consumer.group-id}"
+    )
     public void listen(final String payload, @Header("kafka_receivedTopic") final String topic) {
-        log.info(payload);
+        log.info("Received Kafka message: {}", payload);
         try {
-            this.handleIncomingMessageWithMqttClient(topic, this.objectMapper.readValue(payload, DeviceMeasurementDto.class));
+            final var measurement = this.deserializePayload(payload);
+            this.processMeasurement(topic, measurement);
         } catch (final JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new MessageProcessingException("Failed to process Kafka message", e);
         }
     }
 
-    private void handleIncomingMessageWithMqttClient(final String topic, final DeviceMeasurementDto measure) {
+    private DeviceMeasurementDto deserializePayload(final String payload) throws JsonProcessingException {
+        return this.objectMapper.readValue(payload, DeviceMeasurementDto.class);
+    }
+
+    private void processMeasurement(final String topic, final DeviceMeasurementDto measure) {
         switch (topic) {
-            case "CREATE_DEVICE_MEASUREMENT"->this.mqttClientService.addSubscription(measure);
-
-            case "UPDATE_DEVICE_MEASUREMENT"->this.mqttClientService.updateSubscription(measure);
-
-            case "DELETE_DEVICE_MEASUREMENT"->this.mqttClientService.removeSubscription(measure);
-
-            default-> log.warn("Received message for unknown topic {}: {}", topic, measure);
-
+            case KafkaTopics.CREATE_MEASUREMENT -> this.mqttClientService.addSubscription(measure);
+            case KafkaTopics.UPDATE_MEASUREMENT -> this.mqttClientService.updateSubscription(measure);
+            case KafkaTopics.DELETE_MEASUREMENT -> this.mqttClientService.removeSubscription(measure);
+            default -> log.warn(UNKNOWN_TOPIC_MESSAGE, topic, measure);
         }
     }
 
+    private static class KafkaTopics {
+        static final String CREATE_MEASUREMENT = "CREATE_DEVICE_MEASUREMENT";
+        static final String UPDATE_MEASUREMENT = "UPDATE_DEVICE_MEASUREMENT";
+        static final String DELETE_MEASUREMENT = "DELETE_DEVICE_MEASUREMENT";
+
+        private KafkaTopics() {
+        }
+    }
+
+    public static class MessageProcessingException extends RuntimeException {
+        public MessageProcessingException(final String message, final Throwable cause) {
+            super(message, cause);
+        }
+    }
 }

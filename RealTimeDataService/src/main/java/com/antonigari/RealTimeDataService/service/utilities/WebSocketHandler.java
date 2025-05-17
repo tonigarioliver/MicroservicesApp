@@ -1,9 +1,9 @@
 package com.antonigari.RealTimeDataService.service.utilities;
 
 import com.antonigari.RealTimeDataService.config.websocket.WebSocketCommands;
-import com.antonigari.RealTimeDataService.event.NewMeasureSubscriptionEvent;
-import com.antonigari.RealTimeDataService.event.RemoveMeasureSubscriptionEvent;
-import com.antonigari.RealTimeDataService.event.WebSocketDisconnectedEvent;
+import com.antonigari.RealTimeDataService.event.SubscribeMeasureEvent;
+import com.antonigari.RealTimeDataService.event.UnsubscribeMeasureEvent;
+import com.antonigari.RealTimeDataService.event.WebSocketDisconnectEvent;
 import com.antonigari.RealTimeDataService.model.DeviceMeasurementWebSocketRequest;
 import com.antonigari.RealTimeDataService.model.WebSocketHandlerMessage;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -14,6 +14,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
@@ -23,14 +24,12 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 @Component
-@AllArgsConstructor
 @Slf4j
+@AllArgsConstructor
 public class WebSocketHandler extends TextWebSocketHandler {
-    private ApplicationEventPublisher eventPublisher;
-    List<WebSocketSession> webSocketSessions;
+    private final ApplicationEventPublisher eventPublisher;
     private final ObjectMapper objectMapper = JsonMapper.builder()
             .addModule(new ParameterNamesModule())
             .addModule(new Jdk8Module())
@@ -40,35 +39,53 @@ public class WebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(final WebSocketSession session) throws Exception {
         super.afterConnectionEstablished(session);
-        this.webSocketSessions.add(session);
+        log.info("WebSocket connection established for session: {}", session.getId());
     }
 
     @Override
     public void afterConnectionClosed(final WebSocketSession session, final CloseStatus status) throws Exception {
         super.afterConnectionClosed(session, status);
-        this.webSocketSessions.remove(session);
-        this.eventPublisher.publishEvent(new WebSocketDisconnectedEvent(this, session));
+        this.publishEvent(new WebSocketDisconnectEvent(this, session));
+        log.info("WebSocket connection closed for session: {}, status: {}", session.getId(), status);
     }
+
 
     @Override
     public void handleMessage(final WebSocketSession session, final WebSocketMessage<?> message) throws Exception {
         super.handleMessage(session, message);
-        final String receivedJson = new String(((TextMessage) message).asBytes(), StandardCharsets.UTF_8);
-        log.info("Received message: " + receivedJson);
-        this.handleEventMessage(this.objectMapper.readValue(receivedJson, WebSocketHandlerMessage.class), session);
+        final var receivedJson = parseMessageContent((TextMessage) message);
+        log.info("Received message from session {}: {}", session.getId(), receivedJson);
+
+        final var handlerMessage = this.parseHandlerMessage(receivedJson);
+        this.processWebSocketMessage(handlerMessage, session);
     }
 
-
-    private void handleEventMessage(
-            final WebSocketHandlerMessage webSocketHandlerMessage,
-            final WebSocketSession session
-    ) throws JsonProcessingException {
-        final DeviceMeasurementWebSocketRequest deviceMeasurementWebSocketRequest = this.objectMapper.readValue(webSocketHandlerMessage.payload(), DeviceMeasurementWebSocketRequest.class);
-        switch (WebSocketCommands.valueOf(webSocketHandlerMessage.command())) {
-            case SUBSCRIBE-> this.eventPublisher.publishEvent(new NewMeasureSubscriptionEvent(this, deviceMeasurementWebSocketRequest.topic(), session));
-            case REMOVE-> this.eventPublisher.publishEvent(new RemoveMeasureSubscriptionEvent(this, deviceMeasurementWebSocketRequest.topic(), session));
-            default -> this.eventPublisher.publishEvent(new WebSocketDisconnectedEvent(this, session));
-        }
+    private static String parseMessageContent(final TextMessage message) {
+        return new String(message.asBytes(), StandardCharsets.UTF_8);
     }
 
+    private WebSocketHandlerMessage parseHandlerMessage(final String json) throws JsonProcessingException {
+        return this.objectMapper.readValue(json, WebSocketHandlerMessage.class);
+    }
+
+    private void processWebSocketMessage(final WebSocketHandlerMessage handlerMessage, final WebSocketSession session)
+            throws JsonProcessingException {
+        final var request = this.objectMapper.readValue(handlerMessage.payload(), DeviceMeasurementWebSocketRequest.class);
+
+        final var command = WebSocketCommands.valueOf(handlerMessage.command());
+        final var event = this.createEventForCommand(command, request.topic(), session);
+        this.publishEvent(event);
+    }
+
+    private ApplicationEvent createEventForCommand(final WebSocketCommands command, final String topic, final WebSocketSession session) {
+        return switch (command) {
+            case SUBSCRIBE -> new SubscribeMeasureEvent(this, topic, session);
+            case REMOVE -> new UnsubscribeMeasureEvent(this, topic, session);
+            default -> new WebSocketDisconnectEvent(this, session);
+        };
+    }
+
+    private void publishEvent(final ApplicationEvent event) {
+        this.eventPublisher.publishEvent(event);
+    }
 }
