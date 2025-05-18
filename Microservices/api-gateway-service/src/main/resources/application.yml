@@ -1,0 +1,46 @@
+spring:
+  profiles:
+    active: dev
+  application:
+    name: api-gateway-service
+  cloud:
+    gateway:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health"
+
+api-gateway:
+  routes:
+    - id: user-service
+      path: /auth/**
+      uri: lb://user-service
+      applyJwtFilter: true
+    - id: iot-device-service
+      path: /iotDeviceService/**
+      uri: lb://device-service
+      applyJwtFilter: true
+    - id: real-time-data-service
+      path: /realTimeDataService/**
+      uri: lb://stream-service
+      applyJwtFilter: false
+
+
+
+services:
+  userService:
+    name: user-service

@@ -60,8 +60,8 @@ services:
     networks:
       - my-network
 
-  eurekaserver:
-    container_name: eurekaserver
+  discovery-service:
+    container_name: discovery-service
     depends_on:
       - mqtt5
       - kafka
@@ -72,7 +72,7 @@ services:
       context: .
       dockerfile: docker/Dockerfile
       args:
-        MODULE_NAME: EurekaServer
+        MODULE_NAME: discovery-service
     environment:
       SPRING_PROFILES_ACTIVE: prod
     networks:
@@ -88,7 +88,7 @@ services:
   user-service:
     container_name: user-service
     depends_on:
-      eurekaserver:
+      discovery-service:
         condition: service_healthy
     ports:
       - "8008:8008"
@@ -96,7 +96,7 @@ services:
       context: .
       dockerfile: docker/Dockerfile
       args:
-        MODULE_NAME: UserService
+        MODULE_NAME: user-service
     environment:
       SPRING_PROFILES_ACTIVE: prod
     networks:
@@ -109,8 +109,8 @@ services:
       start_period: 20s
       timeout: 5s
 
-  grpcserverservice:
-    container_name: grpcserverservice
+  grpc-server-service:
+    container_name: grpc-server-service
     depends_on:
       user-service:
         condition: service_healthy
@@ -120,20 +120,20 @@ services:
       context: .
       dockerfile: docker/Dockerfile
       args:
-        MODULE_NAME: GrpcServerService
+        MODULE_NAME: grpc-server-service
     environment:
       SPRING_PROFILES_ACTIVE: prod
     networks:
       - my-network
     restart: unless-stopped
 
-  iotdeviceservice:
-    container_name: iotdeviceservice
+  device-service:
+    container_name: device-service
     build:
       context: .
       dockerfile: docker/Dockerfile
       args:
-        MODULE_NAME: IotDeviceService
+        MODULE_NAME: device-service
     environment:
       SPRING_PROFILES_ACTIVE: prod
     ports:
@@ -151,34 +151,34 @@ services:
       start_period: 120s
       timeout: 10s
 
-  mqtt_client_service:
-    container_name: mqtt_client_service
+  mqtt-client-service:
+    container_name: mqtt-client-service
     restart: unless-stopped
     build:
       context: .
       dockerfile: docker/Dockerfile
       args:
-        MODULE_NAME: MqttClient
+        MODULE_NAME: mqtt-client
     environment:
       SPRING_PROFILES_ACTIVE: prod
     depends_on:
-      iotdeviceservice:
+      device-service:
         condition: service_healthy
     networks:
       - my-network
 
-  real_time_data_service:
-    container_name: real_time_service
+  stream-service:
+    container_name: stream-service
     ports:
       - "8005:8005"
     depends_on:
-      iotdeviceservice:
+      device-service:
         condition: service_healthy
     build:
       context: .
       dockerfile: docker/Dockerfile
       args:
-        MODULE_NAME: RealTimeDataService
+        MODULE_NAME: stream-service
     environment:
       SPRING_PROFILES_ACTIVE: prod
     networks:
@@ -195,7 +195,7 @@ services:
     container_name: api-gateway-service
     restart: always
     depends_on:
-      real_time_data_service:
+      stream-service:
         condition: service_healthy
     ports:
       - "8080:8080"
@@ -203,7 +203,7 @@ services:
       context: .
       dockerfile: docker/Dockerfile
       args:
-        MODULE_NAME: ApiGatewayService
+        MODULE_NAME: api-gateway-service
     environment:
       SPRING_PROFILES_ACTIVE: prod
     networks:
@@ -219,7 +219,7 @@ services:
       PGADMIN_DEFAULT_EMAIL: user@domain.com
       PGADMIN_DEFAULT_PASSWORD: postgres
     depends_on:
-      - eurekaserver
+      - discovery-service
     volumes:
       - pgadmin-data:/var/lib/pgadmin
     networks:

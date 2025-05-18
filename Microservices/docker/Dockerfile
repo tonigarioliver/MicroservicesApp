@@ -9,14 +9,14 @@ WORKDIR /app
 COPY pom.xml ./pom.xml
 
 # Copiar todos los submódulos (copiar las carpetas completas)
-COPY ./GrpcClientLibrary ./GrpcClientLibrary
-COPY ./RealTimeDataService ./RealTimeDataService
-COPY ./IotDeviceService ./IotDeviceService
-COPY ./GrpcServerService ./GrpcServerService
-COPY ./ApiGatewayService ./ApiGatewayService
-COPY ./EurekaServer ./EurekaServer
-COPY ./UserService ./UserService
-COPY ./MqttClient ./MqttClient
+COPY ./grpc-client-library ./grpc-client-library
+COPY ./stream-service ./stream-service
+COPY ./device-service ./device-service
+COPY ./grpc-server-service ./grpc-server-service
+COPY ./api-gateway-service ./api-gateway-service
+COPY ./discovery-service ./discovery-service
+COPY ./user-service ./user-service
+COPY ./mqtt-client ./mqtt-client
 
 # Construir solo el módulo solicitado y sus dependencias
 RUN mvn clean install -pl ${MODULE_NAME} -am -DskipTests

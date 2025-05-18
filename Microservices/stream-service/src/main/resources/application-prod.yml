@@ -1,0 +1,15 @@
+spring:
+  kafka:
+    bootstrap-servers: kafka:9092
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://discovery-service:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+mqtt:
+  server:
+    ip: tcp://mqtt5
+    port: 1883
