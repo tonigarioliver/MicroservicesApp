@@ -1,8 +1,8 @@
 package com.antonigari.RealTimeDataService.service.Impl;
 
 
-import com.antonigari.RealTimeDataService.model.DeviceMeasurementDto;
 import com.antonigari.RealTimeDataService.service.IKafkaConsumerService;
+import com.antonigari.grpcclient.model.DeviceMeasurementDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;

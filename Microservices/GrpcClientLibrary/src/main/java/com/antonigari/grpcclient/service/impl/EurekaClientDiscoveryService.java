@@ -1,4 +1,4 @@
-package com.example.mqttclient.service.Impl;
+package com.antonigari.grpcclient.service.impl;
 
 import com.antonigari.grpcclient.service.IClientsDiscoveryService;
 import lombok.AllArgsConstructor;
@@ -8,17 +8,19 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * Implementation of IClientsDiscoveryService that uses Eureka for service discovery.
+ */
 @Service
 @AllArgsConstructor
 public class EurekaClientDiscoveryService implements IClientsDiscoveryService {
 
-    private DiscoveryClient discoveryClient;
+    private final DiscoveryClient discoveryClient;
 
     @Override
     public String getServiceUrl(final String serviceName) {
         final List<ServiceInstance> instances = this.discoveryClient.getInstances(serviceName);
         if (instances != null && !instances.isEmpty()) {
-            instances.get(0).getUri();
             return instances.get(0).getUri().toString();
         }
         return null;

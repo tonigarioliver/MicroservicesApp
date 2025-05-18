@@ -1,11 +1,12 @@
 package com.antonigari.RealTimeDataService.service.Impl;
 
+
 import com.antonigari.RealTimeDataService.config.mqtt.MqttClientConfig;
 import com.antonigari.RealTimeDataService.config.mqtt.MqttCustomClient;
-import com.antonigari.RealTimeDataService.model.DeviceMeasurementDto;
 import com.antonigari.RealTimeDataService.service.utilities.MqttMessageHandler;
 import com.antonigari.RealTimeDataService.service.utilities.MqttSubscriptionManager;
 import com.antonigari.RealTimeDataService.service.utilities.WebSocketClientManager;
+import com.antonigari.grpcclient.model.DeviceMeasurementDto;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.mqttv5.common.MqttException;
@@ -73,9 +74,11 @@ public class MqttClientService {
     }
 
     public synchronized void updateSubscription(final DeviceMeasurementDto measure) {
-        final DeviceMeasurementDto existingMeasure = this.subscriptionManager.findMeasurementById(measure.deviceMeasurementId());
+        final DeviceMeasurementDto existingMeasure =
+                this.subscriptionManager.findMeasurementById(measure.deviceMeasurementId());
         if (existingMeasure == null) {
-            log.warn("Cannot update subscription: Topic not found for measurement ID {}", measure.deviceMeasurementId());
+            log.warn("Cannot update subscription: Topic not found for measurement ID {}",
+                    measure.deviceMeasurementId());
             return;
         }
 

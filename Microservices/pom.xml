@@ -11,10 +11,24 @@
     <groupId>com.antonigari</groupId>
     <artifactId>Microservices</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
     <name>Microservices</name>
     <description>Microservices</description>
+
+    <modules>
+        <module>GrpcClientLibrary</module>
+        <module>MqttClient</module>
+        <module>RealTimeDataService</module>
+        <module>IotDeviceService</module>
+        <module>GrpcServerService</module>
+        <module>ApiGatewayService</module>
+        <module>EurekaServer</module>
+        <module>UserService</module>
+    </modules>
     <properties>
         <java.version>21</java.version>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
     </properties>
     <dependencies>
         <dependency>

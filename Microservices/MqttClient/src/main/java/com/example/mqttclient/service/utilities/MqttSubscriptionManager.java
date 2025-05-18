@@ -1,4 +1,4 @@
-package com.antonigari.RealTimeDataService.service.utilities;
+package com.example.mqttclient.service.utilities;
 
 import com.antonigari.grpcclient.model.DeviceMeasurementDto;
 import lombok.extern.slf4j.Slf4j;
@@ -41,5 +41,9 @@ public class MqttSubscriptionManager {
                 .filter(topic -> topic.deviceMeasurementId().equals(measurementId))
                 .findFirst()
                 .orElse(null);
+    }
+
+    public Set<DeviceMeasurementDto> getAllDeviceMeasurement() {
+        return this.measurements;
     }
 }

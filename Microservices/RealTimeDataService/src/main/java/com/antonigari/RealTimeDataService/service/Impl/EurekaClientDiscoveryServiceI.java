@@ -1,44 +1,17 @@
 package com.antonigari.RealTimeDataService.service.Impl;
 
-import com.antonigari.RealTimeDataService.service.IClientsDiscoveryService;
-import lombok.AllArgsConstructor;
-import org.springframework.cloud.client.ServiceInstance;
+import com.antonigari.grpcclient.service.impl.EurekaClientDiscoveryService;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
+/**
+ * Implementation of EurekaClientDiscoveryService for RealTimeDataService.
+ * This class extends the shared implementation from the GrpcClientLibrary.
+ */
 @Service
-@AllArgsConstructor
-public class EurekaClientDiscoveryServiceI implements IClientsDiscoveryService {
+public class EurekaClientDiscoveryServiceI extends EurekaClientDiscoveryService {
 
-    private DiscoveryClient discoveryClient;
-
-    @Override
-    public String getServiceUrl(final String serviceName) {
-        final List<ServiceInstance> instances = this.discoveryClient.getInstances(serviceName);
-        if (instances != null && !instances.isEmpty()) {
-            instances.getFirst().getUri();
-            return instances.getFirst().getUri().toString();
-        }
-        return null;
-    }
-
-    @Override
-    public String getHost(final String serviceName) {
-        final List<ServiceInstance> instances = this.discoveryClient.getInstances(serviceName);
-        if (instances != null && !instances.isEmpty()) {
-            return instances.getFirst().getHost();
-        }
-        return null;
-    }
-
-    @Override
-    public Integer getPort(final String serviceName) {
-        final List<ServiceInstance> instances = this.discoveryClient.getInstances(serviceName);
-        if (instances != null && !instances.isEmpty()) {
-            return instances.getFirst().getPort();
-        }
-        return null;
+    public EurekaClientDiscoveryServiceI(DiscoveryClient discoveryClient) {
+        super(discoveryClient);
     }
 }

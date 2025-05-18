@@ -1,6 +1,6 @@
 package com.example.mqttclient.service.Impl;
 
-import com.example.mqttclient.data.model.DeviceMeasurementDto;
+import com.antonigari.grpcclient.model.DeviceMeasurementDto;
 import com.example.mqttclient.service.IKafkaConsumerService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,7 +26,8 @@ public class KafkaConsumerService implements IKafkaConsumerService {
             .build();
 
     @Override
-    @KafkaListener(topics = "#{'${spring.kafka.consumer.topics}'.split(',')}", groupId = "${spring.kafka.consumer.group-id}")
+    @KafkaListener(topics = "#{'${spring.kafka.consumer.topics}'.split(',')}", groupId = "${spring.kafka.consumer" +
+            ".group-id}")
     public void listen(final String payload, @Header("kafka_receivedTopic") final String topic) {
         log.info(payload);
         final DeviceMeasurementDto measure;

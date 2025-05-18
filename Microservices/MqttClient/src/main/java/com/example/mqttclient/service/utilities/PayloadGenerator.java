@@ -1,8 +1,8 @@
 package com.example.mqttclient.service.utilities;
 
-import com.example.mqttclient.data.model.DeviceMeasurementDto;
+import com.antonigari.grpcclient.model.DeviceMeasurementDto;
+import com.antonigari.grpcclient.model.MeasurementTypeName;
 import com.example.mqttclient.data.model.DeviceMeasurementPayloadDto;
-import com.example.mqttclient.data.model.MeasurementTypeName;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
@@ -27,14 +27,16 @@ public class PayloadGenerator {
 
     public String generatePayload(final DeviceMeasurementDto measure) {
         try {
-            return this.objectMapper.writeValueAsString(this.buildPayload(measure.measurementType().typeName(), measure));
+            return this.objectMapper.writeValueAsString(this.buildPayload(measure.measurementType().typeName(),
+                    measure));
         } catch (final JsonProcessingException e) {
             log.error(e.getMessage());
             return "";
         }
     }
 
-    private DeviceMeasurementPayloadDto buildPayload(final MeasurementTypeName type, final DeviceMeasurementDto measurementDto) {
+    private DeviceMeasurementPayloadDto buildPayload(final MeasurementTypeName type,
+                                                     final DeviceMeasurementDto measurementDto) {
         switch (type) {
             case STRING -> {
                 return DeviceMeasurementPayloadDto.builder()

@@ -1,7 +1,10 @@
-package com.antonigari.RealTimeDataService.model;
+package com.antonigari.grpcclient.model;
 
 import lombok.Builder;
 
+/**
+ * Data Transfer Object for measurement types.
+ */
 @Builder
 public record MeasurementTypeDto(Long measurementTypeId, MeasurementTypeName typeName) {
 }

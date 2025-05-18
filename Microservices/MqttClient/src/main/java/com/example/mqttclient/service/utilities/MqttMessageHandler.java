@@ -1,23 +1,22 @@
 package com.example.mqttclient.service.utilities;
 
-import com.example.mqttclient.config.mqtt.MqttCustomClient;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.mqttv5.client.IMqttToken;
 import org.eclipse.paho.mqttv5.client.MqttDisconnectResponse;
 import org.eclipse.paho.mqttv5.common.MqttException;
 import org.eclipse.paho.mqttv5.common.MqttMessage;
 import org.eclipse.paho.mqttv5.common.packet.MqttProperties;
+import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 
 
 @Slf4j
+@Component
+@AllArgsConstructor
 public class MqttMessageHandler implements org.eclipse.paho.mqttv5.client.MqttCallback {
-    private final MqttCustomClient mqttCustomClient;
 
-    public MqttMessageHandler(final MqttCustomClient mqttCustomClient) {
-        this.mqttCustomClient = mqttCustomClient;
-    }
 
     @Override
     public void disconnected(final MqttDisconnectResponse mqttDisconnectResponse) {

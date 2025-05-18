@@ -68,7 +68,13 @@ services:
       - postgres_db
     ports:
       - "8761:8761"
-    build: ./EurekaServer
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        MODULE_NAME: EurekaServer
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
     networks:
       - my-network
     restart: unless-stopped
@@ -86,7 +92,13 @@ services:
         condition: service_healthy
     ports:
       - "8008:8008"
-    build: ./UserService
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        MODULE_NAME: UserService
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
     networks:
       - my-network
     restart: unless-stopped
@@ -104,14 +116,26 @@ services:
         condition: service_healthy
     ports:
       - "9090:9090"
-    build: ./GrpcServerService
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        MODULE_NAME: GrpcServerService
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
     networks:
       - my-network
     restart: unless-stopped
 
   iotdeviceservice:
     container_name: iotdeviceservice
-    build: ./IotDeviceService
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        MODULE_NAME: IotDeviceService
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
     ports:
       - "8001:8001"
     depends_on:
@@ -130,10 +154,16 @@ services:
   mqtt_client_service:
     container_name: mqtt_client_service
     restart: unless-stopped
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        MODULE_NAME: MqttClient
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
     depends_on:
       iotdeviceservice:
         condition: service_healthy
-    build: ./MqttClient
     networks:
       - my-network
 
@@ -144,7 +174,13 @@ services:
     depends_on:
       iotdeviceservice:
         condition: service_healthy
-    build: ./RealTimeDataService
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        MODULE_NAME: RealTimeDataService
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
     networks:
       - my-network
     restart: unless-stopped
@@ -163,7 +199,13 @@ services:
         condition: service_healthy
     ports:
       - "8080:8080"
-    build: ./ApiGatewayService
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        MODULE_NAME: ApiGatewayService
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
     networks:
       - my-network
 

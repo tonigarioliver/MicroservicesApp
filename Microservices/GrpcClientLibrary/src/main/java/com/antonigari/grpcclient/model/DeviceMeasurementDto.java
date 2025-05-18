@@ -1,7 +1,10 @@
-package com.example.mqttclient.data.model;
+package com.antonigari.grpcclient.model;
 
 import lombok.Builder;
 
+/**
+ * Data Transfer Object for device measurements.
+ */
 @Builder
 public record DeviceMeasurementDto(
         Long deviceMeasurementId,
